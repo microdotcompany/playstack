@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@tabler/icons-react": "^2.47.0",
+    "get-video-id": "^4.1.7",
+    "react-player": "^3.0.0"
+  }
+}
