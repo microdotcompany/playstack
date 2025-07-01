@@ -20,6 +20,9 @@ const ReactPlayer = ({ thumbnail, src, service, onTimeUpdate }) => {
   const player = useRef(null);
   const playerContainer = useRef(null);
 
+  const timeoutControls = useRef(null);
+  const [activeControls, setActiveConrols] = useState(false);
+
   const [fullscreen, setFullscreen] = useState(false);
   const [started, setStarted] = useState(false);
   const [paused, setPaused] = useState(true);
@@ -28,6 +31,8 @@ const ReactPlayer = ({ thumbnail, src, service, onTimeUpdate }) => {
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1);
+
+  const [seeking, setSeeking] = useState(false);
 
   const remainingTime = useMemo(() => {
     let remaining = Math.max(0, Math.floor(duration - currentTime));
@@ -76,19 +81,34 @@ const ReactPlayer = ({ thumbnail, src, service, onTimeUpdate }) => {
   };
 
   useEffect(() => {
-    console.log(OrgReactPlayer.canPlay(src));
-  }, [src]);
-
-  useEffect(() => {
     const container = playerContainer.current;
 
     const onFullscreenChange = () => {
       if (!screenfull.isFullscreen) setFullscreen(false);
     };
+
+    const onScreenEvent = () => {
+      clearTimeout(timeoutControls.current);
+      setActiveConrols(true);
+      timeoutControls.current = setTimeout(() => {
+        setActiveConrols(false);
+      }, 2000);
+    };
+
     container.addEventListener('fullscreenchange', onFullscreenChange);
+
+    container.addEventListener('mouseenter', onScreenEvent);
+    container.addEventListener('mousemove', onScreenEvent);
+    container.addEventListener('touchstart', onScreenEvent);
+    container.addEventListener('touchmove', onScreenEvent);
 
     return () => {
       container.removeEventListener('fullscreenchange', onFullscreenChange);
+
+      container.removeEventListener('mouseenter', onScreenEvent);
+      container.removeEventListener('mousemove', onScreenEvent);
+      container.removeEventListener('touchstart', onScreenEvent);
+      container.removeEventListener('touchmove', onScreenEvent);
     };
   }, [playerContainer]);
 
@@ -108,14 +128,19 @@ const ReactPlayer = ({ thumbnail, src, service, onTimeUpdate }) => {
         playing={!paused}
         playbackRate={playbackRate}
         onReady={() => {
-          setTimeout(() => {
-            player.current.shadowRoot.querySelector('iframe').style.cssText = `
-            height: 1000%;
-            vertical-align: middle;
-            display: block;
-            position: relative;
-            `;
-          }, 1000);
+          const interval = setInterval(() => {
+            const iframe = player.current.shadowRoot.querySelector('iframe');
+
+            if (iframe) {
+              iframe.style.cssText = `
+              height: 1000%;
+              vertical-align: middle;
+              display: block;
+              position: relative;
+              `;
+              clearInterval(interval);
+            }
+          }, 100);
         }}
         onTimeUpdate={(e) => {
           setCurrentTime(e.target.currentTime);
@@ -127,6 +152,8 @@ const ReactPlayer = ({ thumbnail, src, service, onTimeUpdate }) => {
         }}
         onDurationChange={(e) => setDuration(e.target.duration)}
         onPause={() => setPaused(true)}
+        onSeeking={() => setSeeking(true)}
+        onSeeked={() => setSeeking(false)}
       />
       <div
         role="button"
@@ -139,14 +166,6 @@ const ReactPlayer = ({ thumbnail, src, service, onTimeUpdate }) => {
         onClick={() => {
           if (!started) setStarted(true);
           setPaused((state) => !state);
-
-          // try {
-          // if youtube for handle sign in error - if got error then allow iframe clicks and remove absolute play div
-          //   if (paused) return player.current.api.playVideo();
-          //   player.current.api.pauseVideo();
-          // } catch (error) {
-          //   console.log('🚀 ~ ReactPlayer ~ error:', error);
-          // }
         }}
       >
         <div>{paused ? <IconPlayerPlayFilled /> : <IconPlayerPauseFilled />}</div>
@@ -154,12 +173,13 @@ const ReactPlayer = ({ thumbnail, src, service, onTimeUpdate }) => {
       <div
         className="controls"
         style={{
-          opacity: started ? 100 : 0,
-          pointerEvents: !started && 'none'
+          opacity: started && activeControls ? 100 : 0,
+          pointerEvents: !started || !activeControls ? 'none' : 'auto'
         }}
-        onClick={() => setPaused((state) => !state)}
       >
-        <button>{paused ? <IconPlayerPlayFilled /> : <IconPlayerPauseFilled />}</button>
+        <button onClick={() => setPaused((state) => !state)}>
+          {paused ? <IconPlayerPlayFilled /> : <IconPlayerPauseFilled />}
+        </button>
 
         <div className="seekbar">
           <Slider.Root
@@ -169,7 +189,15 @@ const ReactPlayer = ({ thumbnail, src, service, onTimeUpdate }) => {
             step={1}
             onValueChange={(v) => (player.current.currentTime = v[0])}
           >
-            <Slider.Track className="SliderTrack">
+            <Slider.Track
+              className="SliderTrack"
+              style={{
+                '--react-player-seekbar-progress-loaded-percentage': `${
+                  (currentTime / duration) * 100
+                }%`
+              }}
+              data-seeking={seeking ? 'true' : 'false'}
+            >
               <Slider.Range className="SliderRange" />
             </Slider.Track>
             <Slider.Thumb className="SliderThumb" aria-label="Volume" />

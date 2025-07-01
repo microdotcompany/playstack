@@ -69,6 +69,12 @@
 }
 
 /* React Player */
+@keyframes progress {
+  to {
+    width: 100%;
+  }
+}
+
 .react-player-container {
   background: black;
   z-index: 10;
@@ -202,11 +208,22 @@
   height: 5px;
 }
 
+.react-player-container .controls .SliderTrack[data-seeking='true']::after {
+  content: '';
+  height: 5px;
+  position: absolute;
+  border-radius: 9999px;
+  width: var(--react-player-seekbar-progress-loaded-percentage);
+  background: rgba(153, 153, 153, 1);
+  animation: progress 4s ease-in-out infinite;
+}
+
 .react-player-container .controls .SliderRange {
   position: absolute;
   background-color: var(--theme-color);
   border-radius: 9999px;
   height: 100%;
+  z-index: 1;
 }
 
 .react-player-container .controls .SliderThumb {
