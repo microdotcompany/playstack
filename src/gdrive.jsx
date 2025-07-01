@@ -1,7 +1,10 @@
-import React from "react";
-
-const Gdrive = () => {
-  return <div>gdrive</div>;
+const Gdrive = ({ src }) => {
+  return (
+    <div className="gdrive-container">
+      <div className="hide-link" />
+      <iframe src={src} allowFullScreen />
+    </div>
+  );
 };
 
 export default Gdrive;

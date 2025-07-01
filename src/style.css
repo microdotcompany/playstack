@@ -1,0 +1,307 @@
+/* Common */
+.bunny-player-container,
+.react-player-container,
+.gdrive-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16/9;
+  width: 100%;
+  height: 100%;
+}
+
+/* Gdrive Player */
+.gdrive-container .hide-link {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  right: 12px;
+  top: 12px;
+  background: transparent;
+}
+
+.gdrive-container iframe,
+.bunny-player-container iframe {
+  border: none;
+  width: 100%;
+  height: 100%;
+}
+
+/* Bunny Player */
+@keyframes spin {
+  to {
+    rotate: 360;
+  }
+}
+
+.bunny-player-container .thumbnail {
+  z-index: 5;
+  position: absolute;
+  object-fit: cover;
+  object-position: center;
+  width: 100%;
+  height: 100%;
+}
+
+.bunny-player-container .loader {
+  inset: 0;
+  position: absolute;
+  z-index: 10;
+  display: inherit;
+  align-items: inherit;
+  justify-content: inherit;
+  pointer-events: none;
+}
+
+.bunny-player-container .loader > div {
+  border: 2px solid var(--theme-color);
+  border-left-color: transparent;
+  border-radius: 999px;
+  height: 2rem;
+  width: 2rem;
+  animation: spin 0.5s ease-in-out infinite;
+}
+
+.bunny-player-container iframe {
+  background: transparent;
+  z-index: 20;
+}
+
+/* React Player */
+.react-player-container {
+  background: black;
+  z-index: 10;
+  inset: 0;
+  overflow: hidden;
+}
+
+.react-player-container .react-player {
+  width: inherit !important;
+  height: inherit !important;
+  display: inherit !important;
+  align-items: inherit;
+  justify-content: inherit;
+  position: relative;
+  aspect-ratio: inherit;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.react-player-container .control-overlaid {
+  width: inherit;
+  height: inherit;
+  z-index: 10;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.react-player-container .control-overlaid > div {
+  height: 3rem;
+  width: 3rem;
+  background: var(--theme-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  color: white;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+.react-player-container .control-overlaid > div svg {
+  height: 1.6rem;
+  width: 1.6rem;
+}
+
+.react-player-container .controls {
+  position: absolute;
+  bottom: 0;
+  width: inherit;
+  left: 0;
+  z-index: 11;
+  transition: opacity 0.3s ease-in-out;
+  background-image: linear-gradient(to bottom, transparent, rgba(37, 37, 37, 0.8));
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 0.5rem 0.5rem;
+  gap: 0.5rem;
+}
+
+.react-player-container .controls .group-btn-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.1rem;
+}
+
+.react-player-container .controls .group-btn-controls > button,
+.react-player-container .controls > button {
+  color: white;
+  border-radius: 3px;
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem;
+  border: none;
+  outline: none;
+  background: transparent;
+}
+
+.react-player-container .controls .group-btn-controls > button:hover,
+.react-player-container .controls > button:hover {
+  background: var(--theme-color);
+}
+
+.react-player-container .controls .group-btn-controls > button svg,
+.react-player-container .controls > button svg {
+  height: 1.2rem;
+  width: 1.2rem;
+}
+
+.react-player-container .controls > button svg.speaker path:nth-child(3),
+.react-player-container .controls > button svg.speaker-2 path:nth-child(2) {
+  fill: white;
+}
+
+.react-player-container .controls .seekbar {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.react-player-container .controls .seekbar .time {
+  font-size: 12px;
+  color: white;
+}
+
+.react-player-container .controls .SliderRoot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  user-select: none;
+  touch-action: none;
+  width: 100%;
+  height: 20px;
+}
+
+.react-player-container .controls .SliderTrack {
+  background-color: rgba(153, 153, 153, 0.5);
+  position: relative;
+  flex-grow: 1;
+  border-radius: 9999px;
+  height: 5px;
+}
+
+.react-player-container .controls .SliderRange {
+  position: absolute;
+  background-color: var(--theme-color);
+  border-radius: 9999px;
+  height: 100%;
+}
+
+.react-player-container .controls .SliderThumb {
+  display: block;
+  width: 15px;
+  height: 15px;
+  background-color: var(--theme-color);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.react-player-container .controls .SliderThumb:focus {
+  outline: none;
+  box-shadow: 0 0 0 5px color(display-p3 0 0 0/0.6);
+}
+
+.react-player-container div[data-radix-popper-content-wrapper] {
+  z-index: 100000 !important;
+}
+
+.react-player-container .DropdownMenuContent,
+.react-player-container .DropdownMenuSubContent {
+  min-width: 150px;
+  background-color: white;
+  border-radius: 3px;
+  padding: 5px;
+  box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2);
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+
+.react-player-container .RightSlot {
+  margin-left: auto;
+  padding-right: 5px;
+}
+
+.react-player-container .RightSlot svg {
+  height: 1.2rem;
+  width: 1.2rem;
+}
+
+.react-player-container .DropdownMenuCheckboxItem,
+.react-player-container .DropdownMenuSubTrigger {
+  font-size: 14px;
+  line-height: 1;
+  color: var(--theme-color);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  height: 30px;
+  padding: 0 5px;
+  padding-left: 25px;
+  position: relative;
+  user-select: none;
+  outline: none;
+  transition: all 0.3s ease-in-out;
+}
+
+.react-player-container .DropdownMenuSubTrigger {
+  padding-left: 15px !important;
+}
+
+.react-player-container .DropdownMenuItemIndicator {
+  position: absolute;
+  left: 0;
+  width: 25px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+}
+
+.react-player-container .DropdownMenuItemIndicator svg {
+  height: 1rem;
+  width: 1rem;
+}
+
+.react-player-container .DropdownMenuCheckboxItem:hover,
+.react-player-container .DropdownMenuSubTrigger:hover {
+  background-color: var(--theme-color);
+  color: white;
+}
+
+@media screen and (orientation: landscape) and (min-height: 319px) and (max-height: 480px) {
+  .react-player {
+    max-width: 80vw;
+  }
+}
+
+.react-player-container:is(.youtube-shorts) {
+  aspect-ratio: 9/16;
+}
+
+.react-player-container:is(.youtube-shorts) .react-player {
+  width: auto !important;
+}
