@@ -95,12 +95,48 @@ const ReactPlayer = ({ thumbnail, src, service, onTimeUpdate }) => {
       }, 2000);
     };
 
+    const onKeydown = (e) => {
+      if (player.current.currentTime >= 1) {
+        switch (e.code) {
+          case 'Space': {
+            e.preventDefault();
+            setPaused((state) => !state);
+            break;
+          }
+          case 'ArrowRight': {
+            e.preventDefault();
+            player.current.currentTime = player.current.currentTime + 10;
+            break;
+          }
+          case 'ArrowLeft': {
+            e.preventDefault();
+            player.current.currentTime = player.current.currentTime - 10;
+            break;
+          }
+          case 'ArrowUp': {
+            e.preventDefault();
+            setVolume((state) => (state >= 10 ? state : state + 0.1));
+            break;
+          }
+          case 'ArrowDown': {
+            e.preventDefault();
+            setVolume((state) => (state <= 0 ? state : state - 0.1));
+            break;
+          }
+          default:
+            break;
+        }
+      }
+    };
+
     container.addEventListener('fullscreenchange', onFullscreenChange);
 
     container.addEventListener('mouseenter', onScreenEvent);
     container.addEventListener('mousemove', onScreenEvent);
     container.addEventListener('touchstart', onScreenEvent);
     container.addEventListener('touchmove', onScreenEvent);
+
+    document.body.addEventListener('keydown', onKeydown);
 
     return () => {
       container.removeEventListener('fullscreenchange', onFullscreenChange);
@@ -109,8 +145,10 @@ const ReactPlayer = ({ thumbnail, src, service, onTimeUpdate }) => {
       container.removeEventListener('mousemove', onScreenEvent);
       container.removeEventListener('touchstart', onScreenEvent);
       container.removeEventListener('touchmove', onScreenEvent);
+
+      document.body.removeEventListener('keydown', onKeydown);
     };
-  }, [playerContainer]);
+  }, [playerContainer, player]);
 
   return (
     <div className={`react-player-container ${service}`} ref={playerContainer}>
@@ -173,8 +211,8 @@ const ReactPlayer = ({ thumbnail, src, service, onTimeUpdate }) => {
       <div
         className="controls"
         style={{
-          opacity: started && activeControls ? 100 : 0,
-          pointerEvents: !started || !activeControls ? 'none' : 'auto'
+          opacity: started && (activeControls || paused) ? 100 : 0,
+          pointerEvents: started && (activeControls || paused) ? 'auto' : 'none'
         }}
       >
         <button onClick={() => setPaused((state) => !state)}>
