@@ -118,6 +118,7 @@
   border-radius: 9999px;
   color: white;
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  cursor: pointer !important;
 }
 
 .react-player-container .control-overlaid > div svg {
@@ -159,6 +160,7 @@
   border: none;
   outline: none;
   background: transparent;
+  cursor: pointer !important;
 }
 
 .react-player-container .controls .group-btn-controls > button:hover,
@@ -232,7 +234,7 @@
   height: 15px;
   background-color: var(--theme-color);
   border-radius: 10px;
-  cursor: pointer;
+  cursor: pointer !important;
 }
 
 .react-player-container .controls .SliderThumb:focus {
@@ -282,6 +284,7 @@
   user-select: none;
   outline: none;
   transition: all 0.3s ease-in-out;
+  cursor: pointer !important;
 }
 
 .react-player-container .DropdownMenuSubTrigger {
