@@ -4,6 +4,7 @@
     "@radix-ui/react-dropdown-menu": "^2.1.1",
     "@tabler/icons-react": "^2.47.0",
     "get-video-id": "^4.1.7",
-    "react-player": "^3.0.0"
+    "react-player": "^3.0.0",
+    "screenfull": "^6.0.2"
   }
 }
