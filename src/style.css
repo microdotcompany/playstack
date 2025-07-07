@@ -31,7 +31,7 @@
 /* Bunny Player */
 @keyframes spin {
   to {
-    rotate: 360;
+    rotate: 360deg;
   }
 }
 
