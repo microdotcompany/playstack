@@ -272,7 +272,7 @@
 .react-player-container .DropdownMenuSubTrigger {
   font-size: 14px;
   line-height: 1;
-  color: var(--theme-color);
+  color: #555;
   border-radius: 3px;
   display: flex;
   align-items: center;
