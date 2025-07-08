@@ -16,7 +16,7 @@ import { IconVolumeOff } from '@tabler/icons-react';
 import { IconCircleCheckFilled } from '@tabler/icons-react';
 import { IconVolume2 } from '@tabler/icons-react';
 
-const ReactPlayer = ({ thumbnail, src, service, onTimeUpdate }) => {
+const ReactPlayer = ({ thumbnail, src, service, onTimeUpdate, onTitleChange }) => {
   const player = useRef(null);
   const playerContainer = useRef(null);
 
@@ -192,6 +192,9 @@ const ReactPlayer = ({ thumbnail, src, service, onTimeUpdate }) => {
         onPause={() => setPaused(true)}
         onSeeking={() => setSeeking(true)}
         onSeeked={() => setSeeking(false)}
+        onLoadedMetadata={(e) => {
+          if (e.target.api?.videoTitle) onTitleChange?.(e.target.api.videoTitle);
+        }}
       />
       <div
         role="button"

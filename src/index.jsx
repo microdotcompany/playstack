@@ -5,7 +5,7 @@ import ReactPlayer from './react-player';
 import Gdrive from './gdrive';
 import { useMemo } from 'react';
 
-const Player = ({ src, bunnyId, onTimeUpdate }) => {
+const Player = ({ src, bunnyId, onTimeUpdate, onTitleChange }) => {
   const video = useMemo(() => {
     if (src || bunnyId) {
       if (bunnyId)
@@ -68,6 +68,7 @@ const Player = ({ src, bunnyId, onTimeUpdate }) => {
         thumbnail={video.thumbnail}
         service={video.service}
         onTimeUpdate={onTimeUpdate}
+        onTitleChange={onTitleChange}
       />
     ))
   );
