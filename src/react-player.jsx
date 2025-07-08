@@ -167,7 +167,7 @@ const ReactPlayer = ({ thumbnail, src, service, onTimeUpdate, onTitleChange }) =
         playbackRate={playbackRate}
         onReady={() => {
           const interval = setInterval(() => {
-            const iframe = player.current.shadowRoot.querySelector('iframe');
+            const iframe = player.current.shadowRoot?.querySelector('iframe');
 
             if (iframe) {
               iframe.style.cssText = `
