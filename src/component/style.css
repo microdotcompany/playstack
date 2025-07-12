@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+
 /* Common */
 .bunny-player-container,
 .react-player-container,
@@ -55,7 +57,7 @@
 }
 
 .bunny-player-container .loader > div {
-  border: 2px solid var(--theme-color);
+  border: 2px solid var(--player-theme-color);
   border-left-color: transparent;
   border-radius: 999px;
   height: 2rem;
@@ -80,6 +82,7 @@
   z-index: 10;
   inset: 0;
   overflow: hidden;
+  font-family: 'Rubik', sans-serif;
 }
 
 .react-player-container .react-player {
@@ -111,7 +114,7 @@
 .react-player-container .control-overlaid > div {
   height: 3rem;
   width: 3rem;
-  background: var(--theme-color);
+  background: var(--player-theme-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -129,7 +132,7 @@
 .react-player-container .controls {
   position: absolute;
   bottom: 0;
-  width: inherit;
+  width: calc(100% - 1rem);
   left: 0;
   z-index: 11;
   transition: opacity 0.3s ease-in-out;
@@ -165,7 +168,7 @@
 
 .react-player-container .controls .group-btn-controls > button:hover,
 .react-player-container .controls > button:hover {
-  background: var(--theme-color);
+  background: var(--player-theme-color);
 }
 
 .react-player-container .controls .group-btn-controls > button svg,
@@ -222,7 +225,7 @@
 
 .react-player-container .controls .SliderRange {
   position: absolute;
-  background-color: var(--theme-color);
+  background-color: var(--player-theme-color);
   border-radius: 9999px;
   height: 100%;
   z-index: 1;
@@ -232,7 +235,7 @@
   display: block;
   width: 15px;
   height: 15px;
-  background-color: var(--theme-color);
+  background-color: var(--player-theme-color);
   border-radius: 10px;
   cursor: pointer !important;
 }
@@ -308,7 +311,7 @@
 
 .react-player-container .DropdownMenuCheckboxItem:hover,
 .react-player-container .DropdownMenuSubTrigger:hover {
-  background-color: var(--theme-color);
+  background-color: var(--player-theme-color);
   color: white;
 }
 
@@ -324,4 +327,11 @@
 
 .react-player-container:is(.youtube-shorts) .react-player {
   width: auto !important;
+}
+
+.react-player-container .react-player::part(iframe) {
+  height: 1000% !important;
+  vertical-align: middle !important;
+  display: block !important;
+  position: relative !important;
 }
