@@ -222,6 +222,17 @@ export const ReactPlayer = forwardRef(
       };
     }, [playerContainer, player]);
 
+    /**
+     * Reset player state when video source changes
+     */
+    useEffect(() => {
+      setStarted(false);
+      setPaused(true);
+      setCurrentTime(0);
+      setMuted(false);
+      setPlaybackRate(1);
+    }, [src]);
+
     return (
       <div className={`react-player-container ${service}`} ref={playerContainer}>
         {/* Original ReactPlayer component with custom event handling */}
