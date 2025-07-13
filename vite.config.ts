@@ -18,8 +18,8 @@ export default defineConfig(() => ({
     lib: {
       entry: resolve('src', 'component/index.tsx'),
       name: 'Playstack',
-      formats: ['es', 'umd'],
-      fileName: (format) => `playstack.${format}.js`
+      formats: ['cjs', 'es'],
+      fileName: (format) => `index.${format}.js`
     },
     rollupOptions: {
       external: [...Object.keys(packageJson.peerDependencies)]

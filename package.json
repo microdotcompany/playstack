@@ -11,7 +11,7 @@
   "homepage": "https://github.com/microdotcompany/playstack#readme",
   "license": "MIT",
   "private": false,
-  "version": "0.0.3",
+  "version": "0.0.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -62,5 +62,14 @@
     "vite": "^6.3.5",
     "vite-plugin-dts": "^4.5.4",
     "vite-tsconfig-paths": "^5.1.4"
-  }
+  },
+  "keywords": [
+    "react",
+    "player",
+    "media",
+    "youtube",
+    "vimeo",
+    "bunny",
+    "react-component"
+  ]
 }
