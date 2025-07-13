@@ -1,4 +1,27 @@
-import { forwardRef, useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useRef, useState, type ReactNode } from 'react';
+
+export interface BunnyPlayerProviderProps {
+  children: ReactNode;
+}
+
+/**
+ * Provider component that loads the Bunny Player JavaScript library.
+ * This component should wrap your app to ensure the Bunny Player script
+ * is loaded before any Bunny video components are rendered.
+ */
+export const BunnyPlayerProvider = ({ children }: BunnyPlayerProviderProps) => {
+  useEffect(() => {
+    if (!document.head.querySelector('#bunny-player-cdn')) {
+      const script = document.createElement('script');
+      script.src = 'https://assets.mediadelivery.net/playerjs/player-0.1.0.min.js';
+      script.type = 'text/javascript';
+      script.id = 'bunny-player-cdn';
+      document.head.appendChild(script);
+    }
+  }, []);
+
+  return children;
+};
 
 // Global type declaration for the Bunny.net Player.js library
 // This allows TypeScript to recognize the playerjs object that gets loaded externally
@@ -18,7 +41,7 @@ interface props {
 }
 
 // Bunny.net video player component using forwardRef to expose player instance
-const Bunny = forwardRef(({ src, thumbnail, id, onTimeUpdate }: props, ref) => {
+export const Bunny = forwardRef(({ src, thumbnail, id, onTimeUpdate }: props, ref) => {
   // Reference to the iframe element that will contain the video player
   const iframe = useRef<HTMLIFrameElement>(null);
   // Reference to store the interval ID for polling playerjs availability
@@ -86,5 +109,3 @@ const Bunny = forwardRef(({ src, thumbnail, id, onTimeUpdate }: props, ref) => {
     </div>
   );
 });
-
-export default Bunny;

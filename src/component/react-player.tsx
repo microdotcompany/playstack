@@ -44,7 +44,7 @@ interface props {
   reactPlayerProps?: ReactPlayerProps;
 }
 
-const ReactPlayer = forwardRef(
+export const ReactPlayer = forwardRef(
   ({ thumbnail, src, service, onTimeUpdate, onTitleChange, reactPlayerProps = {} }: props, ref) => {
     // Extract event handlers from reactPlayerProps to handle them separately
     const {
@@ -463,5 +463,3 @@ const ReactPlayer = forwardRef(
     );
   }
 );
-
-export default ReactPlayer;

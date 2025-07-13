@@ -10,7 +10,7 @@ interface props {
  * This component creates an iframe wrapper for Google Drive content
  * with a hidden link overlay and fullscreen support.
  */
-const GDrive = forwardRef(({ src }: props, ref: LegacyRef<HTMLIFrameElement>) => {
+export const GDrive = forwardRef(({ src }: props, ref: LegacyRef<HTMLIFrameElement>) => {
   return (
     <div className="gdrive-container">
       {/* Hidden overlay to prevent direct link access */}
@@ -20,5 +20,3 @@ const GDrive = forwardRef(({ src }: props, ref: LegacyRef<HTMLIFrameElement>) =>
     </div>
   );
 });
-
-export default GDrive;

@@ -11,11 +11,11 @@
   "homepage": "https://github.com/microdotcompany/playstack#readme",
   "license": "MIT",
   "private": false,
-  "version": "0.0.4",
+  "version": "0.0.5",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -24,13 +24,13 @@
   ],
   "exports": {
     ".": {
-      "import": "./dist/playstack.es.js",
-      "require": "./dist/playstack.umd.js"
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.umd.js"
     },
     "./dist/style.css": "./dist/style.css"
   },
-  "main": "./dist/playstack.umd.js",
-  "module": "./dist/playstack.es.js",
+  "main": "./dist/index.umd.js",
+  "module": "./dist/index.es.js",
   "types": "./dist/index.d.ts",
   "peerDependencies": {
     "@types/react": "^17.0.0 || ^18 || ^19",

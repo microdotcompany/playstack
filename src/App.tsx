@@ -1,4 +1,4 @@
-import { BunnyPlayerProvider, Player } from './component';
+import { BunnyPlayerProvider, Player } from 'playstack';
 
 // Preview component for testing and demonstrating the player functionality
 // This component wraps the Player with BunnyPlayerProvider to show how

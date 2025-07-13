@@ -21,7 +21,12 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "playstack": ["src/component/index.ts"]
+    },
+    "typeRoots": ["node_modules/@types", "src/component/index.d.ts"]
   },
   "include": ["src"]
 }

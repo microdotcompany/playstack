@@ -1,13 +1,9 @@
-import './style.css';
-import { forwardRef, useEffect, useMemo, type ReactNode } from 'react';
 import getVideoId from 'get-video-id';
-import GDrive from './gdrive';
-import Bunny from './bunny';
-import ReactPlayer, { type ReactPlayerProps } from './react-player';
-
-export interface BunnyPlayerProviderProps {
-  children: ReactNode;
-}
+import { forwardRef, useEffect, useMemo } from 'react';
+import { Bunny } from './bunny';
+import { GDrive } from './gdrive';
+import { ReactPlayer, type ReactPlayerProps } from './react-player';
+import './style.css';
 
 export interface PlayerProps {
   theme?: string;
@@ -17,25 +13,6 @@ export interface PlayerProps {
   onTitleChange?: (title: string) => void;
   reactPlayerProps?: ReactPlayerProps;
 }
-
-/**
- * Provider component that loads the Bunny Player JavaScript library.
- * This component should wrap your app to ensure the Bunny Player script
- * is loaded before any Bunny video components are rendered.
- */
-export const BunnyPlayerProvider = ({ children }: BunnyPlayerProviderProps) => {
-  useEffect(() => {
-    if (!document.head.querySelector('#bunny-player-cdn')) {
-      const script = document.createElement('script');
-      script.src = 'https://assets.mediadelivery.net/playerjs/player-0.1.0.min.js';
-      script.type = 'text/javascript';
-      script.id = 'bunny-player-cdn';
-      document.head.appendChild(script);
-    }
-  }, []);
-
-  return children;
-};
 
 /**
  * Main Player component that handles different video services and sources.

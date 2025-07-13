@@ -6,23 +6,28 @@ import * as packageJson from './package.json';
 import { resolve } from 'node:path';
 
 // https://vite.dev/config/
-export default defineConfig(() => ({
+export default defineConfig({
   plugins: [
     react(),
     tsConfigPaths(),
-    dts({
-      include: ['src/component/']
-    })
+    dts({ rollupTypes: true, tsconfigPath: './tsconfig.app.json' })
   ],
   build: {
     lib: {
-      entry: resolve('src', 'component/index.tsx'),
-      name: 'Playstack',
-      formats: ['cjs', 'es'],
+      entry: resolve(__dirname, 'src/component/index.ts'),
+      name: 'playstack',
+      formats: ['umd', 'es'],
       fileName: (format) => `index.${format}.js`
     },
     rollupOptions: {
-      external: [...Object.keys(packageJson.peerDependencies)]
-    }
+      external: [...Object.keys(packageJson.peerDependencies)],
+      output: {
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name && assetInfo.name.endsWith('.css')) return 'style.css';
+          return assetInfo.name || 'asset';
+        }
+      }
+    },
+    emptyOutDir: true
   }
-}));
+});

@@ -20,6 +20,16 @@ npm install playstack
 yarn add playstack
 ```
 
+### Import CSS Styles
+
+To use the custom player controls, you need to import the CSS styles:
+
+```tsx
+import 'playstack/dist/style.css';
+```
+
+**Note**: The CSS import is required for the custom controls to display properly. Without it, the player will still function but will use the default styling of the underlying video platforms.
+
 ## Quick Start
 
 ### YouTube
