@@ -132,7 +132,7 @@
 .react-player-container .controls {
   position: absolute;
   bottom: 0;
-  width: calc(100% - 1rem);
+  width: 100%;
   left: 0;
   z-index: 11;
   transition: opacity 0.3s ease-in-out;
