@@ -191,6 +191,11 @@ export const ReactPlayer = forwardRef(
               setVolume((state) => (state <= 0 ? state : state - 0.1));
               break;
             }
+            case 'KeyM': {
+              e.preventDefault();
+              setMuted((state) => !state);
+              break;
+            }
             default:
               break;
           }
@@ -334,6 +339,8 @@ export const ReactPlayer = forwardRef(
               max={duration}
               step={1}
               onValueChange={(v) => {
+                setCurrentTime(v[0]);
+                // Directly set the player's current playback time when the seekbar is changed
                 if (player.current) player.current.currentTime = v[0];
               }}
             >

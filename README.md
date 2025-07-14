@@ -193,6 +193,7 @@ Supports all platforms compatible with [react-player](https://github.com/cookpet
 | `→`     | Forward 10 seconds |
 | `↑`     | Increase volume    |
 | `↓`     | Decrease volume    |
+| `M`     | Mute/Unmute        |
 
 ## Customization
 
