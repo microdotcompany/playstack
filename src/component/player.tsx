@@ -84,37 +84,32 @@ export const Player = forwardRef(
       if (theme) document.documentElement.style.setProperty('--player-theme-color', theme);
     }, [theme]);
 
-    // Early return if no video configuration
-    if (!video) return;
-
-    // Render Bunny player for Bunny service
-    if (video.service === 'bunny' && video.id)
-      return (
-        <Bunny
-          src={video.src}
-          thumbnail={video.thumbnail}
-          id={video.id}
-          onTimeUpdate={onTimeUpdate}
-          ref={ref}
-        />
-      );
-
-    // Early return if no source URL
-    if (!video.src) return;
-
-    // Render appropriate player based on service type
-    return video.service === 'gdrive' ? (
-      <GDrive src={video.src} ref={ref} />
-    ) : (
-      <ReactPlayer
+    // Conditional rendering based on video service type
+    return !video ? null : video.service === 'bunny' && video.id ? (
+      // Bunny service with valid ID
+      <Bunny
         src={video.src}
         thumbnail={video.thumbnail}
-        service={video.service}
+        id={video.id}
         onTimeUpdate={onTimeUpdate}
-        onTitleChange={onTitleChange}
-        reactPlayerProps={reactPlayerProps}
         ref={ref}
       />
-    );
+    ) : video.src ? (
+      video.service === 'gdrive' ? (
+        // Google Drive service
+        <GDrive src={video.src} ref={ref} />
+      ) : (
+        // All other services (YouTube, Vimeo, etc.)
+        <ReactPlayer
+          src={video.src}
+          thumbnail={video.thumbnail}
+          service={video.service}
+          onTimeUpdate={onTimeUpdate}
+          onTitleChange={onTitleChange}
+          reactPlayerProps={reactPlayerProps}
+          ref={ref}
+        />
+      )
+    ) : null; // No valid source URL, render nothing
   }
 );

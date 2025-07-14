@@ -142,6 +142,7 @@
   align-items: center;
   padding: 0 0.5rem 0.5rem;
   gap: 0.5rem;
+  box-sizing: border-box;
 }
 
 .react-player-container .controls .group-btn-controls {
