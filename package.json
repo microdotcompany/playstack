@@ -16,7 +16,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "build:page": "vite build --config vite.config.page.ts",
+    "build:demo": "vite build --config vite.config.demo.ts",
     "lint": "eslint .",
     "preview": "vite preview"
   },
