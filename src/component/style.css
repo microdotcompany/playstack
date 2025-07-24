@@ -82,7 +82,11 @@
   z-index: 10;
   inset: 0;
   overflow: hidden;
-  font-family: 'Rubik', sans-serif;
+}
+
+.react-player-container,
+.react-player-container * {
+  font-family: 'Rubik', sans-serif !important;
 }
 
 .react-player-container .react-player {
