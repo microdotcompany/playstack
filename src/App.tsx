@@ -5,7 +5,7 @@ import { useState } from 'react';
 // This component wraps the Player with BunnyPlayerProvider to show how
 // the player works with a sample YouTube video URL
 const App = () => {
-  const [src, setSrc] = useState('https://vimeo.com/90509568');
+  const [src, setSrc] = useState('https://youtu.be/K-NDA_QpVYA');
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
       <BunnyPlayerProvider>
