@@ -415,6 +415,7 @@ export const ReactPlayer = forwardRef(
           </div>
 
           <button
+            style={{ marginRight: isIOS ? '-.4rem' : undefined }}
             onClick={() => {
               if (!player.current) return;
               if (volume <= 0) {
@@ -437,28 +438,30 @@ export const ReactPlayer = forwardRef(
               <IconVolumeOff className="speaker" />
             )}
           </button>
-          <div className="seekbar" style={{ maxWidth: '5rem' }}>
-            <Slider.Root
-              className="SliderRoot"
-              value={[volume]}
-              max={1}
-              step={0.1}
-              onValueChange={(v) => {
-                if (!player.current) return;
-                setVolume(v[0]);
-                if (v[0] <= 0) {
-                  player.current.muted = true;
-                } else {
-                  player.current.muted = false;
-                }
-              }}
-            >
-              <Slider.Track className="SliderTrack">
-                <Slider.Range className="SliderRange" />
-              </Slider.Track>
-              <Slider.Thumb className="SliderThumb" aria-label="Volume" />
-            </Slider.Root>
-          </div>
+          {!isIOS && (
+            <div className="seekbar" style={{ maxWidth: '5rem' }}>
+              <Slider.Root
+                className="SliderRoot"
+                value={[volume]}
+                max={1}
+                step={0.1}
+                onValueChange={(v) => {
+                  if (!player.current) return;
+                  setVolume(v[0]);
+                  if (v[0] <= 0) {
+                    player.current.muted = true;
+                  } else {
+                    player.current.muted = false;
+                  }
+                }}
+              >
+                <Slider.Track className="SliderTrack">
+                  <Slider.Range className="SliderRange" />
+                </Slider.Track>
+                <Slider.Thumb className="SliderThumb" aria-label="Volume" />
+              </Slider.Root>
+            </div>
+          )}
           <div className="group-btn-controls">
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
