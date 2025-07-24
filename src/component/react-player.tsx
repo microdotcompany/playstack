@@ -204,17 +204,18 @@ export const ReactPlayer = forwardRef(
             }
             case 'ArrowUp': {
               e.preventDefault();
-              setVolume((state) => (state >= 10 ? state : state + 0.1));
+              player.current.muted = false;
+              setVolume((state) => (state >= 0.9 ? 1 : state + 0.1));
               break;
             }
             case 'ArrowDown': {
               e.preventDefault();
-              setVolume((state) => (state <= 0 ? state : state - 0.1));
+              setVolume((state) => (state <= 0.1 ? 0 : state - 0.1));
               break;
             }
             case 'KeyM': {
               e.preventDefault();
-              setMuted((state) => !state);
+              player.current.muted = !player.current.muted;
               break;
             }
             default:
@@ -280,7 +281,7 @@ export const ReactPlayer = forwardRef(
               '--controls': 'none'
             } as any
           }
-          volume={muted ? 0 : volume}
+          volume={volume}
           playbackRate={playbackRate}
           onReady={async () => {
             // This is used to fix the issue where Vimeo on iOS requires a double click to play the video for the first time.
@@ -339,9 +340,9 @@ export const ReactPlayer = forwardRef(
             onLoadedMetadata?.(e);
           }}
           onVolumeChange={(e: any) => {
-            // Only update volume and mute state after playback has started
+            // Only update volume (ios) and mute state after playback has started
             if (started) {
-              setVolume(e.target.volume);
+              if (isIOS) setVolume(e.target.volume);
               setMuted(e.target.muted);
             }
             onVolumeChange?.(e);
@@ -405,12 +406,15 @@ export const ReactPlayer = forwardRef(
 
           <button
             onClick={() => {
+              if (!player.current) return;
               if (volume <= 0) {
                 setMuted(false);
+                player.current.muted = false;
                 return setVolume(0.1);
               }
-
-              setMuted((state) => !state);
+              const state = !player.current.muted;
+              setMuted(state);
+              player.current.muted = state;
             }}
           >
             {!(volume <= 0 || muted) ? (
@@ -429,7 +433,15 @@ export const ReactPlayer = forwardRef(
               value={[volume]}
               max={1}
               step={0.1}
-              onValueChange={(v) => setVolume(v[0])}
+              onValueChange={(v) => {
+                if (!player.current) return;
+                setVolume(v[0]);
+                if (v[0] <= 0) {
+                  player.current.muted = true;
+                } else {
+                  player.current.muted = false;
+                }
+              }}
             >
               <Slider.Track className="SliderTrack">
                 <Slider.Range className="SliderRange" />
