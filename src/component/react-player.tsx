@@ -64,6 +64,14 @@ export const ReactPlayer = forwardRef(
       ...restReactPlayerProps
     } = reactPlayerProps;
 
+    /**
+     * Detect iOS devices for special fullscreen handling
+     * iOS requires different fullscreen implementation than standard web APIs
+     */
+    const isIOS =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
     // Player and container refs for DOM manipulation
     const player = useRef<Iplayer | HTMLVideoElement | null>(null);
     const playerContainer = useRef<HTMLDivElement>(null);
@@ -76,7 +84,7 @@ export const ReactPlayer = forwardRef(
     const [fullscreen, setFullscreen] = useState(false);
     const [started, setStarted] = useState(false);
     const [paused, setPaused] = useState(true);
-    const [volume, setVolume] = useState(0.5);
+    const [volume, setVolume] = useState(isIOS ? 1 : 0.5);
     const [muted, setMuted] = useState(false);
     const [duration, setDuration] = useState(0);
     const [currentTime, setCurrentTime] = useState(0);
@@ -120,14 +128,6 @@ export const ReactPlayer = forwardRef(
 
       return parts.join(':');
     }, [currentTime, duration]);
-
-    /**
-     * Detect iOS devices for special fullscreen handling
-     * iOS requires different fullscreen implementation than standard web APIs
-     */
-    const isIOS =
-      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
     /**
      * Toggle fullscreen mode with iOS-specific handling
