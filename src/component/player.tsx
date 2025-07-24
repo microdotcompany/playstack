@@ -36,7 +36,8 @@ export const Player = forwardRef(
             id: bunny.id
           };
 
-        if (!src) return null;
+        // Only allow valid HTTPS URLs or blob URLs for video sources; otherwise, return null
+        if (!src || !(src.startsWith('https://') || src.startsWith('blob:'))) return null;
 
         // Parse video URL to extract service and ID
         const videoData = getVideoId(src);
