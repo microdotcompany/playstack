@@ -210,7 +210,13 @@ export const ReactPlayer = forwardRef(
             }
             case 'ArrowDown': {
               e.preventDefault();
-              setVolume((state) => (state <= 0.1 ? 0 : state - 0.1));
+              setVolume((state) => {
+                if (state <= 0.1) {
+                  if (player.current) player.current.muted = true;
+                  return 0;
+                }
+                return state - 0.1;
+              });
               break;
             }
             case 'KeyM': {
