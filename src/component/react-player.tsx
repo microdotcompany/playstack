@@ -91,7 +91,11 @@ export const ReactPlayer = forwardRef(
      * If currently playing, pause the video and update state.
      */
     const togglePlay = () => {
-      if (!started) setStarted(true);
+      if (!started) {
+        // Ensure the player is unmuted when playback starts for the first time
+        if (player.current?.muted) player.current.muted = false;
+        setStarted(true);
+      }
       setPaused((state) => !state);
     };
 
