@@ -11,11 +11,12 @@
   "homepage": "https://github.com/microdotcompany/playstack#readme",
   "license": "MIT",
   "private": false,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:page": "vite build --config vite.config.page.ts",
     "lint": "eslint .",
     "preview": "vite preview"
   },

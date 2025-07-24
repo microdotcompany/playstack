@@ -25,14 +25,18 @@ import { IconVolume2 } from '@tabler/icons-react';
  * to accept either an Iplayer (custom player with shadowRoot) or HTMLVideoElement
  * instead of the original ReactPlayer's onReady signature
  */
-export interface ReactPlayerProps extends Omit<OrgReactPlayerProps, 'onReady'> {
+export interface ReactPlayerProps extends Omit<OrgReactPlayerProps, 'onReady' | 'playsInline'> {
   onReady?: (player: Iplayer | HTMLVideoElement) => void;
+  playsInline?: 1 | 0;
 }
 
 interface Iplayer extends VideoElementProps {
   currentTime: number;
   duration: number;
   shadowRoot: ShadowRoot;
+  paused: Boolean;
+  play: () => void;
+  pause: () => void;
 }
 
 interface props {
@@ -55,6 +59,8 @@ export const ReactPlayer = forwardRef(
       onSeeking,
       onSeeked,
       onLoadedMetadata,
+      onPlay,
+      onVolumeChange,
       ...restReactPlayerProps
     } = reactPlayerProps;
 
@@ -78,6 +84,16 @@ export const ReactPlayer = forwardRef(
 
     // Seeking state for UI feedback
     const [seeking, setSeeking] = useState(false);
+
+    /**
+     * Toggle play/pause state of the player.
+     * If currently paused, play the video and update state.
+     * If currently playing, pause the video and update state.
+     */
+    const togglePlay = () => {
+      if (!started) setStarted(true);
+      setPaused((state) => !state);
+    };
 
     /**
      * Calculate remaining time in HH:MM:SS format
@@ -105,12 +121,9 @@ export const ReactPlayer = forwardRef(
      * Detect iOS devices for special fullscreen handling
      * iOS requires different fullscreen implementation than standard web APIs
      */
-    const isIOS = () => {
-      return (
-        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
-      );
-    };
+    const isIOS =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
     /**
      * Toggle fullscreen mode with iOS-specific handling
@@ -119,10 +132,9 @@ export const ReactPlayer = forwardRef(
     const toggleFullscreen = () => {
       if (!playerContainer.current) return;
 
-      const ios = isIOS();
-      if ((ios && fullscreen) || screenfull.isFullscreen) {
+      if ((isIOS && fullscreen) || screenfull.isFullscreen) {
         // Exit fullscreen
-        if (ios) {
+        if (isIOS) {
           playerContainer.current.style.position = 'relative';
           playerContainer.current.style.zIndex = '10';
         } else {
@@ -131,9 +143,18 @@ export const ReactPlayer = forwardRef(
         setFullscreen(false);
       } else {
         // Enter fullscreen
-        if (ios) {
-          playerContainer.current.style.position = 'fixed';
-          playerContainer.current.style.zIndex = '100000000';
+        if (isIOS) {
+          const video = // @ts-ignore
+            player.current?.tagName === 'VIDEO'
+              ? player.current
+              : player.current?.shadowRoot?.querySelector('video');
+          if (!video) {
+            playerContainer.current.style.position = 'fixed';
+            playerContainer.current.style.zIndex = '100000000';
+          } else {
+            // @ts-ignore
+            if (video.webkitEnterFullscreen) return video.webkitEnterFullscreen();
+          }
         } else {
           screenfull.request(playerContainer.current);
         }
@@ -168,7 +189,7 @@ export const ReactPlayer = forwardRef(
           switch (e.code) {
             case 'Space': {
               e.preventDefault();
-              setPaused((state) => !state);
+              togglePlay();
               break;
             }
             case 'ArrowRight': {
@@ -248,7 +269,10 @@ export const ReactPlayer = forwardRef(
           }}
           className="react-player"
           slot="media"
-          playsInline={true}
+          // The playsInline prop (true/false) does not reliably control inline playback across all browsers, especially on iOS.
+          // @ts-ignore
+          playsInline={isIOS ? 0 : 1}
+          playing={!paused}
           src={src}
           controls={false}
           style={
@@ -257,13 +281,21 @@ export const ReactPlayer = forwardRef(
             } as any
           }
           volume={muted ? 0 : volume}
-          playing={!paused}
           playbackRate={playbackRate}
-          onReady={() => {
+          onReady={async () => {
+            // This is used to fix the issue where Vimeo on iOS requires a double click to play the video for the first time.
+            if (service === 'vimeo' && isIOS) {
+              try {
+                await player.current?.play();
+                player.current?.pause();
+              } catch (error) {
+                console.log('🚀 ~ onReady vimeo play ~ error:', error);
+              }
+            }
+
             // Wait for iframe to be available in shadowRoot before calling onReady
             const interval = setInterval(() => {
               if (!player.current) return;
-
               const iframe = player.current.shadowRoot?.querySelector('iframe');
               if (iframe) {
                 iframe.setAttribute('part', 'iframe');
@@ -286,6 +318,10 @@ export const ReactPlayer = forwardRef(
             setDuration(e.target.duration);
             onDurationChange?.(e);
           }}
+          onPlay={(e) => {
+            setPaused(false);
+            onPlay?.(e);
+          }}
           onPause={(e) => {
             setPaused(true);
             onPause?.(e);
@@ -302,6 +338,14 @@ export const ReactPlayer = forwardRef(
             if (e.target.api?.videoTitle) onTitleChange?.(e.target.api.videoTitle);
             onLoadedMetadata?.(e);
           }}
+          onVolumeChange={(e: any) => {
+            // Only update volume and mute state after playback has started
+            if (started) {
+              setVolume(e.target.volume);
+              setMuted(e.target.muted);
+            }
+            onVolumeChange?.(e);
+          }}
           {...restReactPlayerProps}
         />
         {/* Overlay play button with thumbnail background */}
@@ -313,10 +357,7 @@ export const ReactPlayer = forwardRef(
             backgroundColor: !started && thumbnail ? 'black' : 'transparent',
             opacity: !paused ? 0 : 100
           }}
-          onClick={() => {
-            if (!started) setStarted(true);
-            setPaused((state) => !state);
-          }}
+          onClick={togglePlay}
         >
           <div>{paused ? <IconPlayerPlayFilled /> : <IconPlayerPauseFilled />}</div>
         </div>
@@ -328,7 +369,7 @@ export const ReactPlayer = forwardRef(
             pointerEvents: started && (activeControls || paused) ? 'auto' : 'none'
           }}
         >
-          <button onClick={() => setPaused((state) => !state)}>
+          <button onClick={togglePlay}>
             {paused ? <IconPlayerPlayFilled /> : <IconPlayerPauseFilled />}
           </button>
 
@@ -472,9 +513,11 @@ export const ReactPlayer = forwardRef(
               </DropdownMenu.Portal>
             </DropdownMenu.Root>
 
-            <button onClick={toggleFullscreen}>
-              {fullscreen ? <IconArrowsMinimize /> : <IconArrowsMaximize />}
-            </button>
+            {(!isIOS || service === 'other') && (
+              <button onClick={toggleFullscreen}>
+                {fullscreen ? <IconArrowsMinimize /> : <IconArrowsMaximize />}
+              </button>
+            )}
           </div>
         </div>
       </div>

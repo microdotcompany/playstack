@@ -124,7 +124,7 @@ The Player component supports ref forwarding. You can use a callback function th
 - **URL Formats**: Standard YouTube URLs, YouTube Shorts, YouTube-nocookie
 - **Usage**: Simply pass the YouTube URL to the `src` prop
 - **Theme Support**: ✅ Full theme customization
-- **iOS Fullscreen**: ⚠️ Limited support due to iOS browser restrictions
+- **iOS Fullscreen**: ✅ Native fullscreen support on iOS (video automatically enters fullscreen when playback starts)
 - **Example**:
   ```tsx
   <Player src="https://www.youtube.com/watch?v=dQw4w9WgXcQ" />
@@ -138,7 +138,7 @@ The Player component supports ref forwarding. You can use a callback function th
 - **URL Formats**: Standard Vimeo URLs, Vimeo player URLs
 - **Usage**: Simply pass the Vimeo URL to the `src` prop
 - **Theme Support**: ✅ Full theme customization
-- **iOS Fullscreen**: ⚠️ Limited support due to iOS browser restrictions
+- **iOS Fullscreen**: ✅ Native fullscreen support on iOS (video automatically enters fullscreen when playback starts)
 - **Example**:
   ```tsx
   <Player src="https://vimeo.com/123456789" />
@@ -173,16 +173,26 @@ The Player component supports ref forwarding. You can use a callback function th
 - **iOS Fullscreen**: ✅ Full native iOS fullscreen support
 - **Note**: The component hides Google Drive's "Open" link button for cleaner UI
 
+### Direct Video, HLS, DASH
+
+- **Features**: Native HTML5 video support, including HLS and DASH streams
+- **Theme Support**: ✅ Full theme customization
+- **iOS Fullscreen**: ✅ Native fullscreen support on iOS (video enters fullscreen when playback starts)
+
 ### Other Platforms
 
 Supports all platforms compatible with [react-player](https://github.com/cookpete/react-player/):
 
-- Facebook
 - Twitch
-- SoundCloud
+- Wistia
 - And many more
 
-**Note**: Theme customization and iOS fullscreen limitations only apply to platforms that use the custom ReactPlayer component (YouTube, Vimeo, Facebook, Twitch, etc.). Bunny Stream and Google Drive use their native iframe implementations and provide full iOS fullscreen support.
+**Note**:
+
+- Theme customization and iOS fullscreen limitations only apply to platforms that use the custom ReactPlayer component (YouTube, Vimeo, direct video, HLS, DASH, etc.).
+- **iOS Fullscreen**:
+  - YouTube, Vimeo, direct video, HLS, DASH: ✅ Native fullscreen support (video automatically enters fullscreen on play)
+  - Other platforms: ⚠️ Limited fullscreen support on iOS
 
 ## Keyboard Controls
 
@@ -257,8 +267,9 @@ The `reactPlayerProps` prop allows you to pass any prop supported by [react-play
 ## Mobile Support
 
 - **iOS Safari**:
-  - YouTube, Vimeo, and other react-player platforms: Limited fullscreen support due to iOS browser restrictions
+  - YouTube, Vimeo, direct video, HLS, DASH: Native fullscreen support (video automatically enters fullscreen on play)
   - Bunny Stream and Google Drive: Full native iOS fullscreen support
+  - Other platforms: Limited fullscreen support on iOS
 - **Android Chrome**: Standard fullscreen APIs with touch-friendly controls
 - **Touch Controls**: Gesture support across all platforms
 

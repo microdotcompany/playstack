@@ -55,7 +55,11 @@ export const Player = forwardRef(
               id: match[1]
             };
 
-          return null;
+          return {
+            service: 'other',
+            src,
+            id: src.split('/')?.pop()
+          };
         }
 
         // Handle YouTube Shorts (convert to regular YouTube URL)
