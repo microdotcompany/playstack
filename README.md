@@ -205,6 +205,8 @@ Supports all platforms compatible with [react-player](https://github.com/cookpet
 | `↓`     | Decrease volume    |
 | `M`     | Mute/Unmute        |
 
+**Note**: On iOS devices, the volume bar is hidden for react-player platforms because browsers do not allow programmatic volume control.
+
 ## Customization
 
 ### Theme Colors
@@ -267,9 +269,12 @@ The `reactPlayerProps` prop allows you to pass any prop supported by [react-play
 ## Mobile Support
 
 - **iOS Safari**:
+
   - YouTube, Vimeo, direct video, HLS, DASH: Native fullscreen support (video automatically enters fullscreen on play)
   - Bunny Stream and Google Drive: Full native iOS fullscreen support
   - Other platforms: Limited fullscreen support on iOS
+  - **Note**: The volume bar will not be displayed on iOS devices for react-player platforms, as programmatic volume control is not supported by iOS browsers.
+
 - **Android Chrome**: Standard fullscreen APIs with touch-friendly controls
 - **Touch Controls**: Gesture support across all platforms
 
