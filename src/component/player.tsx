@@ -195,13 +195,13 @@ export const Player = forwardRef(
 
     useEffect(() => {
       if (ready) {
-        playerRef.current.setVolume(defaultOptions.volume);
+        playerRef.current.setVolume(isIOS ? 1 : defaultOptions.volume);
         playerRef.current.setMuted(defaultOptions.muted);
 
         if (onReady && !started) onReady(playerRef.current);
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [ready, started, playerRef]);
+    }, [ready, started, playerRef, isIOS]);
 
     useEffect(() => {
       if (onVolumeChange) onVolumeChange({ volume, muted });
