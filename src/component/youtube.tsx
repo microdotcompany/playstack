@@ -20,7 +20,8 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
     setReady,
     setVolume,
     setMuted,
-    setPlaybackRate
+    setPlaybackRate,
+    setError
   } = useContext(ContextProvider);
 
   useEffect(() => {
@@ -48,8 +49,9 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
       }
     };
 
-    const onError = (event: any) => {
-      console.log(event);
+    const onError = (error: any) => {
+      console.error('Error player:', error);
+      setError(error);
     };
 
     const onMessage = (event: any) => {

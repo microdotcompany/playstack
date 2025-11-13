@@ -11,7 +11,7 @@ interface OverlayProps {
 }
 
 export const Overlay = ({ thumbnail, player, deferToIframeControls }: OverlayProps) => {
-  const { started, state, ready } = useContext(ContextProvider);
+  const { started, state, ready, error } = useContext(ContextProvider);
 
   const paused = useMemo(() => state === 'paused', [state]);
 
@@ -22,7 +22,7 @@ export const Overlay = ({ thumbnail, player, deferToIframeControls }: OverlayPro
     [deferToIframeControls, started]
   );
 
-  return (
+  return error ? null : (
     <div
       role="button"
       className="control-overlaid"

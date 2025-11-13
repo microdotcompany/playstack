@@ -22,7 +22,8 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
     isIOS,
     setVolume,
     setMuted,
-    setPlaybackRate
+    setPlaybackRate,
+    setError
   } = useContext(ContextProvider);
 
   const url = useMemo(() => {
@@ -58,6 +59,7 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
 
     const onError = (error: any) => {
       console.error('Error player:', error);
+      setError(error);
     };
 
     const onVolumeChange = (data: any) => {

@@ -89,6 +89,8 @@ export const Player = forwardRef(
     const [muted, setMuted] = useState<boolean>(false);
     const [playbackRate, setPlaybackRate] = useState<number>(1);
 
+    const [error, setError] = useState<any>(null);
+
     const video: {
       thumbnail?: string;
       service?: string;
@@ -166,6 +168,7 @@ export const Player = forwardRef(
       setVolume(defaultOptions.volume);
       setMuted(defaultOptions.muted);
       setPlaybackRate(1);
+      setError(null);
     }, [video]);
 
     useEffect(() => {
@@ -232,13 +235,15 @@ export const Player = forwardRef(
           muted,
           setMuted,
           playbackRate,
-          setPlaybackRate
+          setPlaybackRate,
+          error,
+          setError
         }}
       >
         <div
           ref={containerRef}
           className={`playstack-player-container ${video?.service} ${started ? 'started' : ''} ${
-            config?.defaultControls ? 'default-controls' : ''
+            config?.defaultControls || error ? 'default-controls' : ''
           }`}
         >
           {video?.service === 'youtube' || video?.service === 'youtube-shorts' ? (
