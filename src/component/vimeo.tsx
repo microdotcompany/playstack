@@ -76,9 +76,11 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
         playerRef.current = new window.Vimeo.Player(vimeoPlayerRef.current, {
           url: url,
           autoplay: false,
-          controls: 1,
+          controls: true,
           muted: false,
-          playsinline: isIOS ? false : true
+          playsinline: isIOS ? false : true,
+          fullscreen: defaultControls || isIOS ? true : false,
+          keyboard: false
         });
 
         // Wait for player to be ready before attaching event listeners
