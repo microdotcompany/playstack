@@ -192,9 +192,9 @@ export const Controls = ({
           if (volume <= 0) {
             player.current.setMuted(false);
             player.current.setVolume(0.1);
+          } else {
+            player.current.setMuted(!muted);
           }
-
-          player.current.setMuted(!muted);
         }}
       >
         {!(volume <= 0 || muted) ? (
