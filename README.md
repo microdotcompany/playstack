@@ -369,9 +369,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 Need help? We're here to assist you!
 
-- **🐛 Bug Reports**: Found a bug? Please [open an issue](https://github.com/your-username/playstack/issues) with a detailed description, steps to reproduce, and your environment details.
-- **💡 Feature Requests**: Have an idea for a new feature? We'd love to hear it! [Open a feature request](https://github.com/your-username/playstack/issues).
-- **❓ Questions**: For general questions and discussions, check existing [issues](https://github.com/your-username/playstack/issues) or start a new discussion.
+- **🐛 Bug Reports**: Found a bug? Please [open an issue](https://github.com/microdotcompany/playstack/issues) with a detailed description, steps to reproduce, and your environment details.
+- **💡 Feature Requests**: Have an idea for a new feature? We'd love to hear it! [Open a feature request](https://github.com/microdotcompany/playstack/issues).
+- **❓ Questions**: For general questions and discussions, check existing [issues](https://github.com/microdotcompany/playstack/issues) or start a new discussion.
 - **📖 Documentation**: Make sure to check the [API Reference](#api-reference) and [Examples](#quick-start) sections above.
 
 **Before opening an issue**, please:
