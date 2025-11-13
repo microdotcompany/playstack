@@ -100,7 +100,7 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
             cc_load_policy: 0,
             cc_lang_pref: 'en',
             controls: defaultControls ? 1 : 0,
-            disablekb: 1,
+            disablekb: defaultControls ? 0 : 1,
             fs: defaultControls || isIOS ? 1 : 0,
             rel: 0,
             iv_load_policy: 3,

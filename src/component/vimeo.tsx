@@ -80,7 +80,7 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
           muted: false,
           playsinline: isIOS ? false : true,
           fullscreen: defaultControls || isIOS ? true : false,
-          keyboard: false
+          keyboard: defaultControls ? true : false
         });
 
         // Wait for player to be ready before attaching event listeners
