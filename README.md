@@ -1,13 +1,13 @@
 # Playstack
 
-A modern, customizable video player component for React that supports multiple video services including YouTube, Vimeo, Bunny Stream, Google Drive, and more. Built with TypeScript and featuring a beautiful, responsive UI with custom controls.
+A modern, customizable video player component for React that supports multiple video services including YouTube, Vimeo, Bunny Stream, Google Drive, Mux, and more. Built with TypeScript and featuring a beautiful, responsive UI with custom controls.
 
 ## Features
 
-- 🎥 **Multi-platform Support**: YouTube, Vimeo, Bunny Stream, Google Drive, and other video platforms
-- 🎨 **Customizable UI**: Modern, responsive design with theme customization (YouTube, Vimeo, and other react-player platforms)
+- 🎥 **Multi-platform Support**: YouTube, Vimeo, Bunny Stream, Google Drive, Mux, HLS, DASH, and direct video URLs
+- 🎨 **Customizable UI**: Modern, responsive design with theme customization (YouTube, Vimeo, and direct video platforms)
 - ⌨️ **Keyboard Controls**: Full keyboard navigation support
-- **Mobile Optimized**: Touch-friendly controls and iOS fullscreen support
+- 📱 **Mobile Optimized**: Touch-friendly controls and iOS fullscreen support
 - 🎛️ **Advanced Controls**: Custom seekbar, volume control, playback speed, and fullscreen
 - 🔧 **TypeScript**: Fully typed with comprehensive interfaces
 - 🎯 **Accessible**: Built with accessibility in mind using Radix UI components
@@ -32,17 +32,21 @@ import 'playstack/dist/style.css';
 
 ## Quick Start
 
+**Important**: The `Provider` component is required to load all necessary video player libraries. Wrap your app or player components with it.
+
 ### YouTube
 
 ```tsx
-import { Player } from 'playstack';
+import { Player, Provider } from 'playstack';
 
 function App() {
   return (
-    <Player
-      src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-      onTimeUpdate={(time) => console.log('Current time:', time.current)}
-    />
+    <Provider>
+      <Player
+        src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        onTimeUpdate={(time) => console.log('Current time:', time.current)}
+      />
+    </Provider>
   );
 }
 ```
@@ -50,37 +54,41 @@ function App() {
 ### Vimeo
 
 ```tsx
-import { Player } from 'playstack';
+import { Player, Provider } from 'playstack';
 
 function App() {
   return (
-    <Player
-      src="https://vimeo.com/123456789"
-      onTimeUpdate={(time) => console.log('Current time:', time.current)}
-    />
+    <Provider>
+      <Player
+        src="https://vimeo.com/123456789"
+        onTimeUpdate={(time) => console.log('Current time:', time.current)}
+      />
+    </Provider>
   );
 }
 ```
 
 ### Bunny Stream Integration
 
-**Important**: Bunny Stream requires both `src` and `bunny` props to work properly. If `src` is not provided, the player will show a loading indicator indefinitely.
+**Important**: Bunny Stream requires both `src` (iframe URL) and `config.bunny` props to work properly. If `src` is not provided, the player will show a loading indicator indefinitely.
 
 ```tsx
-import { Player, BunnyPlayerProvider } from 'playstack';
+import { Player, Provider } from 'playstack';
 
 function App() {
   return (
-    <BunnyPlayerProvider>
+    <Provider>
       <Player
         src="https://iframe.mediadelivery.net/embed/your-library/your-video-id"
-        bunny={{
-          id: 'your-video-id',
-          hostname: 'your-library.b-cdn.net'
+        config={{
+          bunny: {
+            id: 'your-video-id',
+            hostname: 'your-library.b-cdn.net'
+          }
         }}
         onTimeUpdate={(time) => console.log('Current time:', time.current)}
       />
-    </BunnyPlayerProvider>
+    </Provider>
   );
 }
 ```
@@ -89,21 +97,27 @@ function App() {
 
 ### Player Props
 
-| Prop               | Type                                                    | Default     | Description                                                                                                                                       |
-| ------------------ | ------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src`              | `string`                                                | -           | Direct video URL (YouTube, Vimeo, etc.) or Bunny Stream iframe URL                                                                                |
-| `bunny`            | `{ id: string; hostname: string }`                      | -           | Bunny Stream configuration (requires `src` to be provided)                                                                                        |
-| `theme`            | `string`                                                | `'#00B2FF'` | Theme color for player controls (YouTube, Vimeo, and other react-player platforms only)                                                           |
-| `onTimeUpdate`     | `(time: { current: number; duration: number }) => void` | -           | Callback for time updates                                                                                                                         |
-| `onTitleChange`    | `(title: string) => void`                               | -           | Callback when video title is available                                                                                                            |
-| `reactPlayerProps` | `ReactPlayerProps`                                      | -           | Additional props for ReactPlayer component. See [react-player documentation](https://github.com/cookpete/react-player/) for all available options |
+| Prop                        | Type                                                    | Default     | Description                                                                                      |
+| --------------------------- | ------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------ |
+| `src`                       | `string`                                                | -           | Direct video URL (YouTube, Vimeo, Mux, HLS, DASH, direct video, etc.) or Bunny Stream iframe URL |
+| `config`                    | `object`                                                | -           | Configuration object (see below)                                                                 |
+| `config.bunny`              | `{ id: string; hostname: string }`                      | -           | Bunny Stream configuration (requires `src` to be provided)                                       |
+| `config.theme`              | `string`                                                | `'#00B2FF'` | Theme color for player controls (YouTube, Vimeo, and direct video platforms only)                |
+| `config.defaultControls`    | `boolean`                                               | `false`     | Use default platform controls instead of custom controls                                         |
+| `config.hidePlayerControls` | `boolean`                                               | `false`     | Hide all player controls (overlay and controls bar)                                              |
+| `onTimeUpdate`              | `(time: { current: number; duration: number }) => void` | -           | Callback for time updates                                                                        |
+| `onDurationChange`          | `(duration: number) => void`                            | -           | Callback when video duration is available                                                        |
+| `onTitleChange`             | `(title?: string) => void`                              | -           | Callback when video title is available (YouTube and Vimeo only)                                  |
+| `onReady`                   | `(player: any) => void`                                 | -           | Callback when player is ready (receives player instance)                                         |
+| `onVolumeChange`            | `(data: { volume: number; muted: boolean }) => void`    | -           | Callback when volume or mute state changes (does not work on Bunny Stream and Google Drive)      |
+| `onPlaybackRateChange`      | `(playbackRate: number) => void`                        | -           | Callback when playback rate changes (does not work on Bunny Stream and Google Drive)             |
 
-### BunnyPlayerProvider
+### Provider
 
-Required wrapper component that loads the Bunny Player JavaScript library.
+Required wrapper component that loads all necessary video player libraries (YouTube API, Vimeo API, Bunny Player.js, HLS.js, Dash.js).
 
 ```tsx
-<BunnyPlayerProvider>{/* Your app components */}</BunnyPlayerProvider>
+<Provider>{/* Your app components */}</Provider>
 ```
 
 ### Player Ref
@@ -112,9 +126,11 @@ The Player component supports ref forwarding. You can use a callback function th
 
 **Note**: The ref receives different player objects depending on the platform:
 
-- **YouTube, Vimeo, and other react-player platforms**: ReactPlayer instance with HTMLMediaElement-compatible methods
+- **YouTube**: YouTube Player instance with methods like `playVideo()`, `pauseVideo()`, `seekTo()`, etc.
+- **Vimeo**: Vimeo Player instance with methods like `play()`, `pause()`, `setCurrentTime()`, etc.
+- **Direct video, HLS, DASH**: HTMLVideoElement-compatible object with methods like `play()`, `pause()`, `seekTo()`, `setVolume()`, etc.
 - **Bunny Stream**: Bunny Player.js instance
-- **Google Drive**: iframe element only (limited functionality)
+- **Google Drive**: iframe element only (no player functionality - just an iframe embed)
 
 ## Supported Platforms
 
@@ -150,16 +166,18 @@ The Player component supports ref forwarding. You can use a callback function th
 
 - **Documentation**: [Bunny Stream Embedding Documentation](https://docs.bunny.net/docs/stream-embedding-videos)
 - **Features**: Native integration with Bunny's Player.js library
-- **Requirements**: Both `src` (iframe URL) and `bunny` (configuration) props must be provided
+- **Requirements**: Both `src` (iframe URL) and `config.bunny` (configuration) props must be provided
 - **Theme Support**: ❌ Uses Bunny's native player (theme only affects loading indicator)
 - **iOS Fullscreen**: ✅ Full native iOS fullscreen support
 - **Usage**:
   ```tsx
   <Player
     src="https://iframe.mediadelivery.net/embed/your-library/your-video-id"
-    bunny={{
-      id: 'your-video-id',
-      hostname: 'your-library.b-cdn.net'
+    config={{
+      bunny: {
+        id: 'your-video-id',
+        hostname: 'your-library.b-cdn.net'
+      }
     }}
   />
   ```
@@ -167,32 +185,35 @@ The Player component supports ref forwarding. You can use a callback function th
 
 ### Google Drive
 
-- **Features**: Basic iframe embedding with hidden link overlay
-- **Limitation**: No additional functionality beyond embedding
+- **Features**: Simple iframe embedding only (no player functionality)
+- **Limitation**: Just an iframe wrapper - no controls, no callbacks, no player methods
 - **Theme Support**: ❌ Uses Google Drive's native iframe (no theme customization)
 - **iOS Fullscreen**: ✅ Full native iOS fullscreen support
-- **Note**: The component hides Google Drive's "Open" link button for cleaner UI
+- **Note**: The component hides Google Drive's "Open" link button for cleaner UI. This is a basic iframe embed with no video player features.
+
+### Mux
+
+- **Features**: Native support for Mux video streams (HLS)
+- **URL Formats**: Mux stream URLs (automatically converts to `.m3u8` if needed)
+- **Theme Support**: ✅ Full theme customization
+- **iOS Fullscreen**: ✅ Native fullscreen support on iOS (video enters fullscreen when playback starts)
+- **Example**:
+  ```tsx
+  <Player src="https://stream.mux.com/your-video-id" />
+  <Player src="https://stream.mux.com/your-video-id.m3u8" />
+  ```
 
 ### Direct Video, HLS, DASH
 
 - **Features**: Native HTML5 video support, including HLS and DASH streams
 - **Theme Support**: ✅ Full theme customization
 - **iOS Fullscreen**: ✅ Native fullscreen support on iOS (video enters fullscreen when playback starts)
-
-### Other Platforms
-
-Supports all platforms compatible with [react-player](https://github.com/cookpete/react-player/):
-
-- Twitch
-- Wistia
-- And many more
-
-**Note**:
-
-- Theme customization and iOS fullscreen limitations only apply to platforms that use the custom ReactPlayer component (YouTube, Vimeo, direct video, HLS, DASH, etc.).
-- **iOS Fullscreen**:
-  - YouTube, Vimeo, direct video, HLS, DASH: ✅ Native fullscreen support (video automatically enters fullscreen on play)
-  - Other platforms: ⚠️ Limited fullscreen support on iOS
+- **Example**:
+  ```tsx
+  <Player src="https://example.com/video.mp4" />
+  <Player src="https://example.com/stream.m3u8" />
+  <Player src="https://example.com/stream.mpd" />
+  ```
 
 ## Keyboard Controls
 
@@ -205,34 +226,33 @@ Supports all platforms compatible with [react-player](https://github.com/cookpet
 | `↓`     | Decrease volume    |
 | `M`     | Mute/Unmute        |
 
-**Note**: On iOS devices, the volume bar is hidden for react-player platforms because browsers do not allow programmatic volume control.
+**Note**: On iOS devices, the volume bar is hidden for custom controls because browsers do not allow programmatic volume control.
 
 ## Customization
 
 ### Theme Colors
 
-**Note**: Theme customization only works with YouTube, Vimeo, and other react-player platforms.
+**Note**: Theme customization only works with YouTube, Vimeo, and direct video platforms.
 
 ```tsx
-<Player theme="#FF6B6B" src="https://www.youtube.com/watch?v=dQw4w9WgXcQ" />
+<Player src="https://www.youtube.com/watch?v=dQw4w9WgXcQ" config={{ theme: '#FF6B6B' }} />
 ```
 
-### Custom ReactPlayer Props
+### Default Controls
 
-The `reactPlayerProps` prop allows you to pass any prop supported by [react-player](https://github.com/cookpete/react-player/).
+You can use the platform's default controls instead of custom controls:
 
 ```tsx
-<Player
-  src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-  reactPlayerProps={{
-    onReady: (player) => console.log('Player ready:', player),
-    onError: (error) => console.error('Player error:', error),
-    onProgress: (state) => console.log('Progress:', state)
-  }}
-/>
+<Player src="https://www.youtube.com/watch?v=dQw4w9WgXcQ" config={{ defaultControls: true }} />
 ```
 
-**For a complete list of all available props and options, see the [react-player documentation](https://github.com/cookpete/react-player/).**
+### Hide Controls
+
+You can hide all custom controls:
+
+```tsx
+<Player src="https://www.youtube.com/watch?v=dQw4w9WgXcQ" config={{ hidePlayerControls: true }} />
+```
 
 ## Advanced Features
 
@@ -248,7 +268,20 @@ The `reactPlayerProps` prop allows you to pass any prop supported by [react-play
 />
 ```
 
+### Duration Tracking
+
+```tsx
+<Player
+  src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+  onDurationChange={(duration) => {
+    console.log(`Video duration: ${duration} seconds`);
+  }}
+/>
+```
+
 ### Title Extraction
+
+**Note**: Title extraction only works with YouTube and Vimeo platforms.
 
 ```tsx
 <Player
@@ -258,6 +291,35 @@ The `reactPlayerProps` prop allows you to pass any prop supported by [react-play
   }}
 />
 ```
+
+### Player Ready Callback
+
+```tsx
+<Player
+  src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+  onReady={(player) => {
+    console.log('Player ready:', player);
+    // Access player methods directly
+    // player.play(), player.pause(), etc.
+  }}
+/>
+```
+
+### Volume and Playback Rate Tracking
+
+```tsx
+<Player
+  src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+  onVolumeChange={({ volume, muted }) => {
+    console.log(`Volume: ${volume}, Muted: ${muted}`);
+  }}
+  onPlaybackRateChange={(rate) => {
+    console.log(`Playback rate: ${rate}x`);
+  }}
+/>
+```
+
+**Note**: `onVolumeChange` and `onPlaybackRateChange` do not work with Bunny Stream and Google Drive.
 
 ## Browser Support
 
@@ -270,30 +332,30 @@ The `reactPlayerProps` prop allows you to pass any prop supported by [react-play
 
 - **iOS Safari**:
 
-  - YouTube, Vimeo, direct video, HLS, DASH: Native fullscreen support (video automatically enters fullscreen on play)
+  - YouTube, Vimeo, direct video, HLS, DASH, Mux: Native fullscreen support (video automatically enters fullscreen on play)
   - Bunny Stream and Google Drive: Full native iOS fullscreen support
-  - Other platforms: Limited fullscreen support on iOS
-  - **Note**: The volume bar will not be displayed on iOS devices for react-player platforms, as programmatic volume control is not supported by iOS browsers.
+  - **Note**: The volume bar will not be displayed on iOS devices for custom controls, as programmatic volume control is not supported by iOS browsers.
 
 - **Android Chrome**: Standard fullscreen APIs with touch-friendly controls
 - **Touch Controls**: Gesture support across all platforms
 
 ## Dependencies
 
-- [react-player](https://github.com/cookpete/react-player/) - Core video player functionality
 - [@radix-ui/react-slider](https://www.radix-ui.com/primitives/docs/components/slider) - Accessible slider components
 - [@radix-ui/react-dropdown-menu](https://www.radix-ui.com/primitives/docs/components/dropdown-menu) - Settings menu
 - [@tabler/icons-react](https://tabler-icons.io/) - Icon library
 - [screenfull](https://github.com/sindresorhus/screenfull) - Cross-browser fullscreen API
+- [get-video-id](https://github.com/radiovisual/get-video-id) - Extract video IDs from URLs
 
 ## Credits
 
 This project builds upon the excellent work of:
 
-- **[react-player](https://github.com/cookpete/react-player/)** by Pete Cook - The foundation for multi-platform video support
 - **[Bunny Stream](https://docs.bunny.net/docs/stream-embedding-videos)** - For their powerful video streaming platform and Player.js library
 - **[Radix UI](https://www.radix-ui.com/)** - For accessible, unstyled UI primitives
 - **[Tabler Icons](https://tabler-icons.io/)** - For the beautiful icon set
+- **[HLS.js](https://github.com/video-dev/hls.js/)** - For HLS video streaming support
+- **[Dash.js](https://github.com/Dash-Industry-Forum/dash.js/)** - For DASH video streaming support
 
 ## License
 
@@ -307,6 +369,5 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 For issues and questions:
 
-1. Check the [react-player documentation](https://github.com/cookpete/react-player/)
-2. Review the [Bunny Stream documentation](https://docs.bunny.net/docs/stream-embedding-videos)
-3. Open an issue in this repository
+1. Review the [Bunny Stream documentation](https://docs.bunny.net/docs/stream-embedding-videos)
+2. Open an issue in this repository
