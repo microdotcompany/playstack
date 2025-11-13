@@ -172,7 +172,7 @@ export const Controls = ({
             className="SliderTrack"
             style={
               {
-                '--react-player-seekbar-progress-loaded-percentage': `${
+                '--playstack-player-seekbar-progress-loaded-percentage': `${
                   (currentTime / duration) * 100
                 }%`
               } as any

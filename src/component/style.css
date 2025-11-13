@@ -225,7 +225,7 @@
   height: 5px;
   position: absolute;
   border-radius: 9999px;
-  width: var(--react-player-seekbar-progress-loaded-percentage);
+  width: var(--playstack-player-seekbar-progress-loaded-percentage);
   background: rgba(153, 153, 153, 1);
   animation: progress 4s ease-in-out infinite;
 }
@@ -323,7 +323,7 @@
 }
 
 @media screen and (orientation: landscape) and (min-height: 319px) and (max-height: 480px) {
-  .react-player {
+  .playstack-player-container .youtube-player {
     max-width: 80vw;
   }
 }
