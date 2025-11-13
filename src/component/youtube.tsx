@@ -134,31 +134,31 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
     ref,
     () => ({
       play: () => {
-        playerRef.current.playVideo();
+        playerRef.current?.playVideo();
       },
       pause: () => {
-        playerRef.current.pauseVideo();
+        playerRef.current?.pauseVideo();
       },
       setVolume: (volume: number) => {
-        playerRef.current.setVolume(volume * 100);
+        playerRef.current?.setVolume(volume * 100);
       },
       getTitle: () => {
         return new Promise((resolve) => {
-          resolve(playerRef.current.videoTitle);
+          resolve(playerRef.current?.videoTitle);
         });
       },
       seekTo: (time: number) => {
-        playerRef.current.seekTo(time, true);
+        playerRef.current?.seekTo(time, true);
       },
       setMuted: (muted: boolean) => {
         if (muted) {
-          playerRef.current.mute();
+          playerRef.current?.mute();
         } else {
-          playerRef.current.unMute();
+          playerRef.current?.unMute();
         }
       },
       setPlaybackRate: (playbackRate: number) => {
-        playerRef.current.setPlaybackRate(playbackRate);
+        playerRef.current?.setPlaybackRate(playbackRate);
       },
       instance: () => playerRef.current
     }),

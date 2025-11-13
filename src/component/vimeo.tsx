@@ -114,25 +114,31 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
     ref,
     () => ({
       play: () => {
-        playerRef.current.play();
+        playerRef.current?.play();
       },
       pause: () => {
-        playerRef.current.pause();
+        playerRef.current?.pause();
       },
       setVolume: (volume: number) => {
-        playerRef.current.setVolume(volume);
+        playerRef.current?.setVolume(volume);
       },
-      getTitle: async () => {
-        return await playerRef.current.getVideoTitle().then((title: string) => title);
+      getTitle: () => {
+        return new Promise((resolve) => {
+          if (!playerRef.current) return resolve(null);
+          playerRef.current
+            .getVideoTitle()
+            .then((title: string) => resolve(title))
+            .catch(() => resolve(null));
+        });
       },
       seekTo: (time: number) => {
-        playerRef.current.setCurrentTime(time);
+        playerRef.current?.setCurrentTime(time);
       },
       setMuted: (muted: boolean) => {
-        playerRef.current.setMuted(muted);
+        playerRef.current?.setMuted(muted);
       },
       setPlaybackRate: (playbackRate: number) => {
-        playerRef.current.setPlaybackRate(playbackRate);
+        playerRef.current?.setPlaybackRate(playbackRate);
       },
       instance: () => playerRef.current
     }),

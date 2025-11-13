@@ -12,7 +12,7 @@ const App = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
       <Provider>
-        <Player ref={playerRef} src={src} />
+        <Player ref={playerRef} src={src} onTitleChange={(title) => console.log('title', title)} />
       </Provider>
       <div
         style={{
