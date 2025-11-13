@@ -378,10 +378,17 @@
   display: inherit;
   position: inherit;
   width: inherit;
-  height: inherit;
   z-index: inherit;
   align-items: inherit;
   justify-content: inherit;
   aspect-ratio: inherit;
   overflow: inherit;
+}
+
+.playstack-player-container .vimeo-player {
+  height: auto;
+}
+
+.playstack-player-container .youtube-player {
+  height: inherit;
 }
