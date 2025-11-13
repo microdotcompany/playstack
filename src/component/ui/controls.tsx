@@ -148,7 +148,7 @@ export const Controls = ({
 
   return (
     <div
-      className="controls"
+      className={`controls ${fullscreen ? 'fullscreen' : ''}`}
       style={{
         opacity: started && (activeControls || paused) ? 100 : 0,
         pointerEvents: started && (activeControls || paused) ? 'auto' : 'none'

@@ -383,12 +383,9 @@
   justify-content: inherit;
   aspect-ratio: inherit;
   overflow: inherit;
-}
-
-.playstack-player-container .vimeo-player {
-  height: auto;
-}
-
-.playstack-player-container .youtube-player {
   height: inherit;
+}
+
+.playstack-player-container:has(.fullscreen) .vimeo-player {
+  height: auto !important;
 }
