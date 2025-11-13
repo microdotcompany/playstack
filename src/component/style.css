@@ -389,3 +389,8 @@
 .playstack-player-container:has(.fullscreen) .vimeo-player {
   height: auto !important;
 }
+
+/* Prevent iframe from being clicked when the player is started */
+.playstack-player-container:not(.default-controls):is(.started) iframe {
+  pointer-events: none;
+}
