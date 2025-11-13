@@ -1,111 +1,85 @@
-import { forwardRef, useEffect, useRef, useState, type ReactNode } from 'react';
-
-export interface BunnyPlayerProviderProps {
-  children: ReactNode;
-}
-
-/**
- * Provider component that loads the Bunny Player JavaScript library.
- * This component should wrap your app to ensure the Bunny Player script
- * is loaded before any Bunny video components are rendered.
- */
-export const BunnyPlayerProvider = ({ children }: BunnyPlayerProviderProps) => {
-  useEffect(() => {
-    if (!document.head.querySelector('#bunny-player-cdn')) {
-      const script = document.createElement('script');
-      script.src = 'https://assets.mediadelivery.net/playerjs/player-0.1.0.min.js';
-      script.type = 'text/javascript';
-      script.id = 'bunny-player-cdn';
-      document.head.appendChild(script);
-    }
-  }, []);
-
-  return children;
-};
+import { forwardRef, useContext, useEffect, useImperativeHandle, useRef } from 'react';
+import { ContextProvider } from './player';
+import { waitForLibrary } from './helper/wait';
 
 // Global type declaration for the Bunny.net Player.js library
 // This allows TypeScript to recognize the playerjs object that gets loaded externally
-declare global {
-  const playerjs: {
-    Player: new (element: HTMLElement | null) => {
-      on: (event: string, callback: (data: any) => void) => void;
-    };
-  };
-}
-
 interface props {
   src?: string;
   thumbnail?: string;
   id: string;
-  onTimeUpdate?: (time: { current: number; duration: number }) => void;
 }
 
 // Bunny.net video player component using forwardRef to expose player instance
-export const Bunny = forwardRef(({ src, thumbnail, id, onTimeUpdate }: props, ref) => {
+export const Bunny = forwardRef(({ src, thumbnail, id }: props, ref) => {
   // Reference to the iframe element that will contain the video player
   const iframe = useRef<HTMLIFrameElement>(null);
-  // Reference to store the interval ID for polling playerjs availability
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  // State to track whether the player has finished loading and is ready
-  const [playerReady, setPlayerReady] = useState(false);
 
-  // Effect to reset player state when video ID changes
+  const playerRef = useRef<any>(null);
+
+  const { setDuration, setCurrentTime, ready, setReady } = useContext(ContextProvider);
+
   useEffect(() => {
-    setPlayerReady(false);
     // Set iframe background to transparent initially
     if (iframe.current) iframe.current.style.background = 'transparent';
   }, [id]);
 
   // Effect to initialize the Bunny.net player when source changes
   useEffect(() => {
-    // Poll every 100ms to check if playerjs library is available
-    intervalRef.current = setInterval(() => {
-      if (src && typeof playerjs !== 'undefined') {
-        // Clear the polling interval once playerjs is available
-        if (intervalRef.current) clearInterval(intervalRef.current);
+    if (src) {
+      waitForLibrary('playerjs')
+        .then(() => {
+          // Create new player instance with the iframe element
+          playerRef.current = new window.playerjs.Player(iframe.current);
 
-        // Create new player instance with the iframe element
-        const player = new playerjs.Player(iframe.current);
+          // Set up event listeners when player is ready
+          playerRef.current.on('ready', () => {
+            setReady(true);
+            // Change iframe background to black when player is ready
+            if (iframe.current) iframe.current.style.background = 'black';
+            playerRef.current.getDuration((duration: number) => setDuration(duration));
 
-        // Forward the player instance to parent component if ref is a function
-        if (typeof ref === 'function') ref(player);
-
-        // Set up event listeners when player is ready
-        player.on('ready', () => {
-          setPlayerReady(true);
-          // Change iframe background to black when player is ready
-          if (iframe.current) iframe.current.style.background = 'black';
-          // Listen for time updates and call the callback with current time and duration
-          player.on('timeupdate', (time) => {
-            if (typeof onTimeUpdate === 'function')
-              onTimeUpdate({
-                current: time.seconds,
-                duration: time.duration
-              });
+            // Listen for time updates and call the callback with current time and duration
+            playerRef.current.on('timeupdate', (time: any) => {
+              setCurrentTime(time.seconds);
+            });
           });
+        })
+        .catch((error) => {
+          console.error(error);
         });
-      }
-    }, 100);
+    }
 
-    // Cleanup function to clear interval when component unmounts or src changes
+    // Cleanup function to remove event listeners when component unmounts
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (playerRef.current) {
+        playerRef.current.off('ready');
+        playerRef.current.off('timeupdate');
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src]);
 
+  useImperativeHandle(
+    ref,
+    () => ({
+      instance: () => playerRef.current
+    }),
+    [playerRef]
+  );
+
   return (
-    <div className="bunny-player-container">
+    <>
       {/* Display thumbnail image before video loads */}
       <img className="thumbnail" src={thumbnail} />
       {/* Show loading spinner while player is initializing */}
-      {!playerReady && (
+      {!ready && (
         <div className="loader">
           <div />
         </div>
       )}
       {/* Iframe that will contain the Bunny.net video player */}
       <iframe ref={iframe} src={src} allowFullScreen allow="picture-in-picture;" />
-    </div>
+    </>
   );
 });

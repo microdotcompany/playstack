@@ -1,9 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
 
+/* Spin Animation */
+@keyframes spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
 /* Common */
-.bunny-player-container,
-.react-player-container,
-.gdrive-container {
+.playstack-player-container:is(.bunny),
+.playstack-player-container,
+.playstack-player-container:is(.gdrive) {
   position: relative;
   display: flex;
   align-items: center;
@@ -14,7 +21,7 @@
 }
 
 /* Gdrive Player */
-.gdrive-container .hide-link {
+.playstack-player-container:is(.gdrive) .hide-link {
   position: absolute;
   width: 42px;
   height: 42px;
@@ -23,21 +30,16 @@
   background: transparent;
 }
 
-.gdrive-container iframe,
-.bunny-player-container iframe {
+.playstack-player-container:is(.gdrive) iframe,
+.playstack-player-container:is(.bunny) iframe {
   border: none;
   width: 100%;
   height: 100%;
+  border: none !important;
 }
 
 /* Bunny Player */
-@keyframes spin {
-  to {
-    rotate: 360deg;
-  }
-}
-
-.bunny-player-container .thumbnail {
+.playstack-player-container:is(.bunny) .thumbnail {
   z-index: 5;
   position: absolute;
   object-fit: cover;
@@ -46,7 +48,7 @@
   height: 100%;
 }
 
-.bunny-player-container .loader {
+.playstack-player-container:is(.bunny) .loader {
   inset: 0;
   position: absolute;
   z-index: 10;
@@ -56,7 +58,7 @@
   pointer-events: none;
 }
 
-.bunny-player-container .loader > div {
+.playstack-player-container:is(.bunny) .loader > div {
   border: 2px solid var(--player-theme-color);
   border-left-color: transparent;
   border-radius: 999px;
@@ -65,43 +67,31 @@
   animation: spin 0.5s ease-in-out infinite;
 }
 
-.bunny-player-container iframe {
+.playstack-player-container:is(.bunny) iframe {
   background: transparent;
   z-index: 20;
 }
 
-/* React Player */
+/* Other Players */
 @keyframes progress {
   to {
     width: 100%;
   }
 }
 
-.react-player-container {
+.playstack-player-container {
   background: black;
   z-index: 10;
   inset: 0;
   overflow: hidden;
 }
 
-.react-player-container,
-.react-player-container * {
+.playstack-player-container,
+.playstack-player-container * {
   font-family: 'Rubik', sans-serif !important;
 }
 
-.react-player-container .react-player {
-  width: inherit !important;
-  height: inherit !important;
-  display: inherit !important;
-  align-items: inherit;
-  justify-content: inherit;
-  position: relative;
-  aspect-ratio: inherit;
-  box-sizing: border-box;
-  pointer-events: none;
-}
-
-.react-player-container .control-overlaid {
+.playstack-player-container .control-overlaid {
   width: inherit;
   height: inherit;
   z-index: 10;
@@ -113,11 +103,12 @@
   background-repeat: no-repeat;
   background-size: cover;
   transition: opacity 0.3s ease-in-out;
+  inset: 0;
 }
 
-.react-player-container .control-overlaid > div {
-  height: 3rem;
-  width: 3rem;
+.playstack-player-container .control-overlaid > div:not(.loader) {
+  height: 2.8rem;
+  width: 2.8rem;
   background: var(--player-theme-color);
   display: flex;
   align-items: center;
@@ -128,12 +119,23 @@
   cursor: pointer !important;
 }
 
-.react-player-container .control-overlaid > div svg {
+.playstack-player-container .control-overlaid .loader {
+  height: 3rem;
+  width: 3rem;
+  border-radius: 9999px;
+  border: 3px solid var(--player-theme-color);
+  opacity: 0.7;
+  position: absolute;
+  border-left-color: transparent;
+  animation: spin 0.5s ease-in-out infinite;
+}
+
+.playstack-player-container .control-overlaid > div svg {
   height: 1.6rem;
   width: 1.6rem;
 }
 
-.react-player-container .controls {
+.playstack-player-container .controls {
   position: absolute;
   bottom: 0;
   width: 100%;
@@ -149,15 +151,15 @@
   box-sizing: border-box;
 }
 
-.react-player-container .controls .group-btn-controls {
+.playstack-player-container .controls .group-btn-controls {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 0.1rem;
 }
 
-.react-player-container .controls .group-btn-controls > button,
-.react-player-container .controls > button {
+.playstack-player-container .controls .group-btn-controls > button,
+.playstack-player-container .controls > button {
   color: white;
   border-radius: 3px;
   transition: all 0.3s ease-in-out;
@@ -171,23 +173,23 @@
   cursor: pointer !important;
 }
 
-.react-player-container .controls .group-btn-controls > button:hover,
-.react-player-container .controls > button:hover {
+.playstack-player-container .controls .group-btn-controls > button:hover,
+.playstack-player-container .controls > button:hover {
   background: var(--player-theme-color);
 }
 
-.react-player-container .controls .group-btn-controls > button svg,
-.react-player-container .controls > button svg {
+.playstack-player-container .controls .group-btn-controls > button svg,
+.playstack-player-container .controls > button svg {
   height: 1.2rem;
   width: 1.2rem;
 }
 
-.react-player-container .controls > button svg.speaker path:nth-child(3),
-.react-player-container .controls > button svg.speaker-2 path:nth-child(2) {
+.playstack-player-container .controls > button svg.speaker path:nth-child(3),
+.playstack-player-container .controls > button svg.speaker-2 path:nth-child(2) {
   fill: white;
 }
 
-.react-player-container .controls .seekbar {
+.playstack-player-container .controls .seekbar {
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -195,12 +197,12 @@
   gap: 0.25rem;
 }
 
-.react-player-container .controls .seekbar .time {
+.playstack-player-container .controls .seekbar .time {
   font-size: 12px;
   color: white;
 }
 
-.react-player-container .controls .SliderRoot {
+.playstack-player-container .controls .SliderRoot {
   position: relative;
   display: flex;
   align-items: center;
@@ -210,7 +212,7 @@
   height: 20px;
 }
 
-.react-player-container .controls .SliderTrack {
+.playstack-player-container .controls .SliderTrack {
   background-color: rgba(153, 153, 153, 0.5);
   position: relative;
   flex-grow: 1;
@@ -218,7 +220,7 @@
   height: 5px;
 }
 
-.react-player-container .controls .SliderTrack[data-seeking='true']::after {
+.playstack-player-container .controls .SliderTrack[data-seeking='true']::after {
   content: '';
   height: 5px;
   position: absolute;
@@ -228,7 +230,7 @@
   animation: progress 4s ease-in-out infinite;
 }
 
-.react-player-container .controls .SliderRange {
+.playstack-player-container .controls .SliderRange {
   position: absolute;
   background-color: var(--player-theme-color);
   border-radius: 9999px;
@@ -236,7 +238,7 @@
   z-index: 1;
 }
 
-.react-player-container .controls .SliderThumb {
+.playstack-player-container .controls .SliderThumb {
   display: block;
   width: 15px;
   height: 15px;
@@ -245,17 +247,17 @@
   cursor: pointer !important;
 }
 
-.react-player-container .controls .SliderThumb:focus {
+.playstack-player-container .controls .SliderThumb:focus {
   outline: none;
   box-shadow: 0 0 0 5px color(display-p3 0 0 0/0.6);
 }
 
-.react-player-container div[data-radix-popper-content-wrapper] {
+.playstack-player-container div[data-radix-popper-content-wrapper] {
   z-index: 100000 !important;
 }
 
-.react-player-container .DropdownMenuContent,
-.react-player-container .DropdownMenuSubContent {
+.playstack-player-container .DropdownMenuContent,
+.playstack-player-container .DropdownMenuSubContent {
   min-width: 150px;
   background-color: white;
   border-radius: 3px;
@@ -266,18 +268,18 @@
   will-change: transform, opacity;
 }
 
-.react-player-container .RightSlot {
+.playstack-player-container .RightSlot {
   margin-left: auto;
   padding-right: 5px;
 }
 
-.react-player-container .RightSlot svg {
+.playstack-player-container .RightSlot svg {
   height: 1.2rem;
   width: 1.2rem;
 }
 
-.react-player-container .DropdownMenuCheckboxItem,
-.react-player-container .DropdownMenuSubTrigger {
+.playstack-player-container .DropdownMenuCheckboxItem,
+.playstack-player-container .DropdownMenuSubTrigger {
   font-size: 14px;
   line-height: 1;
   color: #555;
@@ -295,11 +297,11 @@
   cursor: pointer !important;
 }
 
-.react-player-container .DropdownMenuSubTrigger {
+.playstack-player-container .DropdownMenuSubTrigger {
   padding-left: 15px !important;
 }
 
-.react-player-container .DropdownMenuItemIndicator {
+.playstack-player-container .DropdownMenuItemIndicator {
   position: absolute;
   left: 0;
   width: 25px;
@@ -309,13 +311,13 @@
   padding: 2px;
 }
 
-.react-player-container .DropdownMenuItemIndicator svg {
+.playstack-player-container .DropdownMenuItemIndicator svg {
   height: 1rem;
   width: 1rem;
 }
 
-.react-player-container .DropdownMenuCheckboxItem:hover,
-.react-player-container .DropdownMenuSubTrigger:hover {
+.playstack-player-container .DropdownMenuCheckboxItem:hover,
+.playstack-player-container .DropdownMenuSubTrigger:hover {
   background-color: var(--player-theme-color);
   color: white;
 }
@@ -326,17 +328,60 @@
   }
 }
 
-.react-player-container:is(.youtube-shorts) {
+.playstack-player-container:is(.youtube-shorts) {
   aspect-ratio: 9/16;
 }
 
-.react-player-container:is(.youtube-shorts) .react-player {
+.playstack-player-container:is(.youtube-shorts) .iframe {
   width: auto !important;
 }
 
-.react-player-container .react-player::part(iframe) {
+.playstack-player-container:not(.default-controls):is(.youtube-shorts) iframe,
+.playstack-player-container:not(.default-controls):is(.youtube) iframe,
+.playstack-player-container:not(.default-controls):is(.vimeo) iframe {
   height: 1000% !important;
   vertical-align: middle !important;
   display: block !important;
-  position: relative !important;
+  position: absolute !important;
+  border: none !important;
+}
+
+.playstack-player-container:not(.default-controls):is(.youtube) iframe {
+  width: 100% !important;
+}
+
+.playstack-player-container:not(.default-controls):is(.vimeo) iframe {
+  width: 1000% !important;
+  scale: 0.1;
+  margin-top: 1rem;
+}
+
+.playstack-player-container:not(.default-controls):is(.vimeo) .vimeo-player {
+  margin-top: -1rem;
+}
+
+.playstack-player-container:is(.default-controls) iframe {
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+}
+
+.playstack-player-container:is(.started) iframe {
+  opacity: 1 !important;
+}
+.playstack-player-container:has(.youtube-player):not(.started):not(.default-controls) iframe {
+  opacity: 0 !important;
+}
+
+.playstack-player-container .youtube-player,
+.playstack-player-container .vimeo-player {
+  display: inherit;
+  position: inherit;
+  width: inherit;
+  height: inherit;
+  z-index: inherit;
+  align-items: inherit;
+  justify-content: inherit;
+  aspect-ratio: inherit;
+  overflow: inherit;
 }

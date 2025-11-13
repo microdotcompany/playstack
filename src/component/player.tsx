@@ -1,31 +1,102 @@
 import getVideoId from 'get-video-id';
-import { forwardRef, useEffect, useMemo } from 'react';
+import {
+  createContext,
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
+import Youtube from './youtube';
+import './style.css';
+import { Overlay } from './ui/overlay';
+import { Controls } from './ui/controls';
+import { Vimeo } from './vimeo';
+import Video from './video';
 import { Bunny } from './bunny';
 import { GDrive } from './gdrive';
-import { ReactPlayer, type ReactPlayerProps } from './react-player';
-import './style.css';
 
-export interface PlayerProps {
-  theme?: string;
-  bunny?: { id: string; hostname: string };
-  src?: string;
-  onTimeUpdate?: (time: { current: number; duration: number }) => void;
-  onTitleChange?: (title: string) => void;
-  reactPlayerProps?: ReactPlayerProps;
+// Global type declaration for the HLS, Vimeo, and YouTube players
+declare global {
+  interface Window {
+    Hls: any;
+    Vimeo: any;
+    onYouTubeIframeAPIReady?: () => void;
+    YT: any;
+    dashjs: any;
+    playerjs: any;
+  }
 }
 
-/**
- * Main Player component that handles different video services and sources.
- * Supports Bunny, Google Drive, YouTube, and other video platforms.
- * Uses forwardRef to expose player controls to parent components.
- */
+export interface PlayerProps {
+  src: string;
+  config?: {
+    bunny?: {
+      id: string;
+      hostname: string;
+    };
+    theme?: string;
+    defaultControls?: boolean;
+    hidePlayerControls?: boolean;
+  };
+  onTimeUpdate?: (time: { current: number; duration: number }) => void;
+  onDurationChange?: (duration: number) => void;
+  onTitleChange?: (title?: string) => void;
+  onReady?: (player: any) => void;
+  onVolumeChange?: (data: { volume: number; muted: boolean }) => void; // it wont work on bunny and gdrive
+  onPlaybackRateChange?: (playbackRate: number) => void; // it wont work on bunny and gdrive
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const ContextProvider = createContext<any>({});
+
+const defaultOptions = {
+  volume: 0.5,
+  muted: false
+};
+
 export const Player = forwardRef(
   (
-    { theme = '#00B2FF', bunny, src, onTimeUpdate, onTitleChange, reactPlayerProps }: PlayerProps,
+    {
+      src,
+      config,
+      onTimeUpdate,
+      onDurationChange,
+      onTitleChange,
+      onReady,
+      onVolumeChange,
+      onPlaybackRateChange
+    }: PlayerProps,
     ref: any
   ) => {
-    // Memoized video configuration based on source or bunny ID
-    const video = useMemo(() => {
+    // detect if the device is iOS
+    const isIOS =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+    const playerRef = useRef<any>(null);
+
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    const [ready, setReady] = useState<boolean>(false);
+
+    const [duration, setDuration] = useState<number>(0);
+    const [currentTime, setCurrentTime] = useState<number>(0);
+    const [state, setState] = useState<string>('paused');
+    const [started, setStarted] = useState<boolean>(false);
+    const [volume, setVolume] = useState<number>(0.5);
+    const [muted, setMuted] = useState<boolean>(false);
+    const [playbackRate, setPlaybackRate] = useState<number>(1);
+
+    const video: {
+      thumbnail?: string;
+      service?: string;
+      src: string;
+      id: string;
+    } | null = useMemo(() => {
+      const { bunny } = config || {};
+
       if (src || bunny?.id) {
         // Handle Bunny video service
         if (bunny?.id)
@@ -49,19 +120,25 @@ export const Player = forwardRef(
             /^https?:\/\/(?:drive\.google\.com|docs\.google\.com)\/(?:file\/d\/|open\?id=|drive\/folders\/|folderview\?id=|drive\/u\/)([^\/?#&]+)/;
           const match = src.match(pattern);
 
-          if (match)
+          if (match) {
+            // drive video id
+            const id = match[1];
             return {
               service: 'gdrive',
-              src: `https://drive.google.com/file/d/${match[1]}/preview`,
-              id: match[1]
+              src: `https://drive.google.com/file/d/${id}/preview`,
+              id
             };
+          }
 
           return {
             service: 'other',
             src,
-            id: src.split('/')?.pop()
+            id: src.split('/')?.pop() || ''
           };
         }
+
+        // if no id, return null
+        if (!videoData.id) return null;
 
         // Handle YouTube Shorts (convert to regular YouTube URL)
         const ytShorts = videoData.service === 'youtube' && src.includes('shorts');
@@ -71,50 +148,144 @@ export const Player = forwardRef(
             videoData.service === 'youtube'
               ? `https://i.ytimg.com/vi/${videoData.id}/sddefault.jpg`
               : undefined,
-          src: ytShorts
-            ? `https://www.youtube.com/watch?v=${videoData.id}`
-            : videoData.service === 'youtube'
-            ? `https://www.youtube-nocookie.com/embed/${videoData.id}`
-            : src,
+          src,
           service: ytShorts ? 'youtube-shorts' : videoData.service,
           id: videoData.id
         };
       }
 
       return null;
-    }, [src, bunny]);
+    }, [src, config]);
 
-    // Apply theme color to CSS custom property
     useEffect(() => {
-      if (theme) document.documentElement.style.setProperty('--player-theme-color', theme);
-    }, [theme]);
+      setDuration(0);
+      setCurrentTime(0);
+      setState('paused');
+      setStarted(false);
+      setReady(false);
+      setVolume(defaultOptions.volume);
+      setMuted(defaultOptions.muted);
+      setPlaybackRate(1);
+    }, [video]);
 
-    // Conditional rendering based on video service type
-    return !video ? null : video.service === 'bunny' && video.id ? (
-      // Bunny service with valid ID
-      <Bunny
-        src={video.src}
-        thumbnail={video.thumbnail}
-        id={video.id}
-        onTimeUpdate={onTimeUpdate}
-        ref={ref}
-      />
-    ) : video.src ? (
-      video.service === 'gdrive' ? (
-        // Google Drive service
-        <GDrive src={video.src} ref={ref} />
-      ) : (
-        // All other services (YouTube, Vimeo, etc.)
-        <ReactPlayer
-          src={video.src}
-          thumbnail={video.thumbnail}
-          service={video.service}
-          onTimeUpdate={onTimeUpdate}
-          onTitleChange={onTitleChange}
-          reactPlayerProps={reactPlayerProps}
-          ref={ref}
-        />
-      )
-    ) : null; // No valid source URL, render nothing
+    useEffect(() => {
+      document.documentElement.style.setProperty(
+        '--player-theme-color',
+        config?.theme || '#00B2FF'
+      );
+    }, [config]);
+
+    useEffect(() => {
+      if (onTimeUpdate) onTimeUpdate({ current: currentTime, duration: duration });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [duration, currentTime]);
+
+    useEffect(() => {
+      if (onDurationChange) onDurationChange(duration);
+
+      if (onTitleChange && ready && typeof playerRef.current?.getTitle === 'function')
+        playerRef.current.getTitle().then((title: string) => {
+          onTitleChange(title);
+        });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [duration, ready]);
+
+    useEffect(() => {
+      if (ready) {
+        playerRef.current.setVolume(defaultOptions.volume);
+        playerRef.current.setMuted(defaultOptions.muted);
+
+        if (onReady && !started) onReady(playerRef.current);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [ready, started, playerRef]);
+
+    useEffect(() => {
+      if (onVolumeChange) onVolumeChange({ volume, muted });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [volume, muted]);
+
+    useEffect(() => {
+      if (onPlaybackRateChange) onPlaybackRateChange(playbackRate);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [playbackRate]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useImperativeHandle(ref, () => playerRef.current, [playerRef, ready]);
+
+    return (
+      <ContextProvider.Provider
+        value={{
+          duration,
+          setDuration,
+          currentTime,
+          setCurrentTime,
+          state,
+          setState,
+          started,
+          setStarted,
+          ready,
+          setReady,
+          volume,
+          setVolume,
+          isIOS,
+          muted,
+          setMuted,
+          playbackRate,
+          setPlaybackRate
+        }}
+      >
+        <div
+          ref={containerRef}
+          className={`playstack-player-container ${video?.service} ${started ? 'started' : ''} ${
+            config?.defaultControls ? 'default-controls' : ''
+          }`}
+        >
+          {video?.service === 'youtube' || video?.service === 'youtube-shorts' ? (
+            <Youtube
+              ref={playerRef}
+              id={video.id}
+              service={video.service}
+              defaultControls={config?.defaultControls}
+            />
+          ) : video?.service === 'vimeo' ? (
+            <Vimeo
+              ref={playerRef}
+              id={video.id}
+              src={video.src}
+              defaultControls={config?.defaultControls}
+            />
+          ) : video?.service === 'bunny' ? (
+            <Bunny {...video} ref={(player) => (playerRef.current = player)} />
+          ) : video?.service === 'gdrive' ? (
+            <GDrive src={video.src} ref={playerRef} />
+          ) : (
+            video?.src && <Video src={video.src} ref={playerRef} />
+          )}
+
+          {!config?.defaultControls &&
+            !config?.hidePlayerControls &&
+            video?.service !== 'bunny' &&
+            video?.service !== 'gdrive' && (
+              <>
+                <Overlay
+                  deferToIframeControls={
+                    video?.service === 'vimeo' ||
+                    video?.service === 'youtube' ||
+                    video?.service === 'youtube-shorts'
+                  }
+                  thumbnail={video?.thumbnail}
+                  player={playerRef}
+                />
+                <Controls
+                  container={containerRef}
+                  player={playerRef}
+                  showFullscreenOnIOS={isIOS && video?.service === 'other'}
+                />
+              </>
+            )}
+        </div>
+      </ContextProvider.Provider>
+    );
   }
 );
