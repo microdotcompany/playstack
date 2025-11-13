@@ -195,8 +195,10 @@ export const Player = forwardRef(
 
     useEffect(() => {
       if (ready) {
-        playerRef.current.setVolume(isIOS ? 1 : defaultOptions.volume);
-        playerRef.current.setMuted(defaultOptions.muted);
+        if (playerRef.current) {
+          playerRef.current.setVolume?.(isIOS ? 1 : defaultOptions.volume);
+          playerRef.current.setMuted?.(defaultOptions.muted);
+        }
 
         if (onReady && !started) onReady(playerRef.current);
       }
