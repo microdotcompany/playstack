@@ -2,7 +2,7 @@ import { Player, Provider } from 'playstack';
 import { useRef, useState } from 'react';
 
 // Preview component for testing and demonstrating the player functionality
-// the player works with a sample YouTube video URL
+// The player works with a sample YouTube video URL
 const App = () => {
   const playerRef = useRef<any>(null);
   const [src, setSrc] = useState('https://youtu.be/K-NDA_QpVYA');

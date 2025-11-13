@@ -2,15 +2,19 @@ import { forwardRef, useContext, useEffect, useImperativeHandle, useRef } from '
 import { ContextProvider } from './player';
 import { waitForLibrary } from './helper/wait';
 
+// Component props interface for YouTube player
 interface YoutubeProps {
   id: string;
   service: string;
   defaultControls?: boolean;
 }
 const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref: any) => {
+  // Ref to store the YouTube Player API instance
   const playerRef = useRef<any>(null);
+  // Ref to the DOM element that will contain the YouTube player
   const youtubePlayerRef = useRef<HTMLDivElement>(null);
 
+  // Access player context methods and state
   const {
     isIOS,
     setStarted,
@@ -27,11 +31,15 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
   useEffect(() => {
     let iframeWindow: any = null;
 
+    // Handler called when YouTube player is ready
+    // Sets the player as ready and captures the video duration
     const onReady = (event: any) => {
       setReady(true);
       setDuration(event.target.getDuration());
     };
 
+    // Handler for YouTube player state changes
+    // Maps YouTube player states (1=playing, 3=buffering, 0=ended, etc.) to our internal state
     const onStateChange = (event: any) => {
       if (event.data === 1) {
         setState('playing');
@@ -49,22 +57,28 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
       }
     };
 
+    // Error handler for YouTube player errors
     const onError = (error: any) => {
       console.error('Error player:', error);
       setError(error);
     };
 
+    // Message handler for cross-origin communication with YouTube iframe
+    // Receives player info updates (currentTime, volume, muted, playbackRate)
     const onMessage = (event: any) => {
       if (event.source === iframeWindow) {
         const data = JSON.parse(event.data);
 
+        // Process infoDelivery events from YouTube player
         if (data.event === 'infoDelivery' && data.info) {
           if (data.info.currentTime) {
             const time = Math.floor(data.info.currentTime);
+            // Update current time only if it has changed
             setCurrentTime((state: number) => (state !== time ? time : state));
           }
 
           if (typeof data.info.volume === 'number') {
+            // YouTube volume is 0-100, convert to 0-1 range
             setVolume(data.info.volume / 100);
           }
 
@@ -79,18 +93,22 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
       }
     };
 
+    // Wait for YouTube IFrame API to load, then initialize player
     waitForLibrary('YT')
       .then(() => {
         const div = document.createElement('div');
 
+        // Remove existing player if present (handles re-initialization)
         if (youtubePlayerRef.current?.firstChild) {
           youtubePlayerRef.current.firstChild.remove();
         }
 
         youtubePlayerRef.current?.appendChild(div);
 
+        // Initialize YouTube Player with configuration
         playerRef.current = new window.YT.Player(div, {
           videoId: id,
+          // Use regular YouTube domain for shorts, nocookie domain for regular videos
           host:
             service === 'youtube-shorts'
               ? 'https://www.youtube.com'
@@ -110,17 +128,21 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
           }
         });
 
+        // Get iframe window reference for message event filtering
         iframeWindow = playerRef.current?.getIframe()?.contentWindow;
 
+        // Attach event listeners to YouTube player
         playerRef.current.addEventListener('onStateChange', onStateChange);
         playerRef.current.addEventListener('onError', onError);
         playerRef.current.addEventListener('onReady', onReady);
+        // Listen for postMessage events from YouTube iframe
         window.addEventListener('message', onMessage);
       })
       .catch((error) => {
         console.error(error);
       });
 
+    // Cleanup: destroy player and remove event listeners on unmount
     return () => {
       if (playerRef.current) {
         playerRef.current.destroy();
@@ -130,6 +152,7 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isIOS, id, service, defaultControls, youtubePlayerRef]);
 
+  // Expose player control methods via ref for parent components
   useImperativeHandle(
     ref,
     () => ({
@@ -140,14 +163,20 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
         playerRef.current?.pauseVideo();
       },
       setVolume: (volume: number) => {
+        // Convert 0-1 range to YouTube's 0-100 range
         playerRef.current?.setVolume(volume * 100);
       },
+      /**
+       * Get the video title
+       * @returns Promise resolving to the video title
+       */
       getTitle: () => {
         return new Promise((resolve) => {
           resolve(playerRef.current?.videoTitle);
         });
       },
       seekTo: (time: number) => {
+        // Seek to time (second parameter true = allow seeking before video is loaded)
         playerRef.current?.seekTo(time, true);
       },
       setMuted: (muted: boolean) => {

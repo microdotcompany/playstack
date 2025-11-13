@@ -1,13 +1,23 @@
+/* Import Rubik font from Google Fonts for consistent typography across the player */
 @import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
 
-/* Spin Animation */
+/* ============================================================================
+   ANIMATIONS
+   ============================================================================ */
+
+/* Spin Animation - Used for loading spinners */
 @keyframes spin {
   to {
     rotate: 360deg;
   }
 }
 
-/* Common */
+/* ============================================================================
+   COMMON CONTAINER STYLES
+   ============================================================================ */
+
+/* Base container styles for all player types (bunny, gdrive, and default) */
+/* Maintains 16:9 aspect ratio and centers content */
 .playstack-player-container:is(.bunny),
 .playstack-player-container,
 .playstack-player-container:is(.gdrive) {
@@ -20,7 +30,12 @@
   height: 100%;
 }
 
-/* Gdrive Player */
+/* ============================================================================
+   GOOGLE DRIVE PLAYER SPECIFIC STYLES
+   ============================================================================ */
+
+/* Hide link button overlay for Google Drive player */
+/* Positioned in top-right corner */
 .playstack-player-container:is(.gdrive) .hide-link {
   position: absolute;
   width: 42px;
@@ -30,6 +45,8 @@
   background: transparent;
 }
 
+/* Iframe styling for Google Drive and Bunny players */
+/* Removes borders and ensures full container coverage */
 .playstack-player-container:is(.gdrive) iframe,
 .playstack-player-container:is(.bunny) iframe {
   border: none;
@@ -38,7 +55,12 @@
   border: none !important;
 }
 
-/* Bunny Player */
+/* ============================================================================
+   BUNNY PLAYER SPECIFIC STYLES
+   ============================================================================ */
+
+/* Thumbnail image overlay for Bunny player */
+/* Displays before video loads */
 .playstack-player-container:is(.bunny) .thumbnail {
   z-index: 5;
   position: absolute;
@@ -48,6 +70,8 @@
   height: 100%;
 }
 
+/* Loading spinner container for Bunny player */
+/* Inherits flex properties from parent and centers the loader */
 .playstack-player-container:is(.bunny) .loader {
   inset: 0;
   position: absolute;
@@ -58,6 +82,8 @@
   pointer-events: none;
 }
 
+/* Loading spinner circle animation */
+/* Uses theme color and spins continuously */
 .playstack-player-container:is(.bunny) .loader > div {
   border: 2px solid var(--player-theme-color);
   border-left-color: transparent;
@@ -67,18 +93,24 @@
   animation: spin 0.5s ease-in-out infinite;
 }
 
+/* Bunny player iframe - positioned above thumbnail and loader */
 .playstack-player-container:is(.bunny) iframe {
   background: transparent;
   z-index: 20;
 }
 
-/* Other Players */
+/* ============================================================================
+   GENERAL PLAYER STYLES
+   ============================================================================ */
+
+/* Progress animation for seekbar loading indicator */
 @keyframes progress {
   to {
     width: 100%;
   }
 }
 
+/* Main player container - black background with overflow hidden */
 .playstack-player-container {
   background: black;
   z-index: 10;
@@ -86,11 +118,18 @@
   overflow: hidden;
 }
 
+/* Apply Rubik font to all elements within the player container */
 .playstack-player-container,
 .playstack-player-container * {
   font-family: 'Rubik', sans-serif !important;
 }
 
+/* ============================================================================
+   OVERLAY CONTROLS (Play Button, Loading State)
+   ============================================================================ */
+
+/* Overlay container for play button and loading state */
+/* Covers entire player area with background image support */
 .playstack-player-container .control-overlaid {
   width: inherit;
   height: inherit;
@@ -106,6 +145,7 @@
   inset: 0;
 }
 
+/* Play button styling - circular button with theme color */
 .playstack-player-container .control-overlaid > div:not(.loader) {
   height: 2.8rem;
   width: 2.8rem;
@@ -119,6 +159,7 @@
   cursor: pointer !important;
 }
 
+/* Loading spinner in overlay - larger version for main overlay */
 .playstack-player-container .control-overlaid .loader {
   height: 3rem;
   width: 3rem;
@@ -130,11 +171,18 @@
   animation: spin 0.5s ease-in-out infinite;
 }
 
+/* Icon sizing within overlay buttons */
 .playstack-player-container .control-overlaid > div svg {
   height: 1.6rem;
   width: 1.6rem;
 }
 
+/* ============================================================================
+   BOTTOM CONTROLS BAR
+   ============================================================================ */
+
+/* Main controls bar at the bottom of the player */
+/* Gradient background for better visibility over video */
 .playstack-player-container .controls {
   position: absolute;
   bottom: 0;
@@ -151,6 +199,7 @@
   box-sizing: border-box;
 }
 
+/* Group of control buttons (e.g., volume, settings) */
 .playstack-player-container .controls .group-btn-controls {
   display: flex;
   flex-direction: row;
@@ -158,6 +207,7 @@
   gap: 0.1rem;
 }
 
+/* Individual control buttons - transparent with hover effect */
 .playstack-player-container .controls .group-btn-controls > button,
 .playstack-player-container .controls > button {
   color: white;
@@ -173,22 +223,30 @@
   cursor: pointer !important;
 }
 
+/* Hover state for control buttons - shows theme color background */
 .playstack-player-container .controls .group-btn-controls > button:hover,
 .playstack-player-container .controls > button:hover {
   background: var(--player-theme-color);
 }
 
+/* Icon sizing for control buttons */
 .playstack-player-container .controls .group-btn-controls > button svg,
 .playstack-player-container .controls > button svg {
   height: 1.2rem;
   width: 1.2rem;
 }
 
+/* Speaker icon fill color - ensures white fill on specific paths */
 .playstack-player-container .controls > button svg.speaker path:nth-child(3),
 .playstack-player-container .controls > button svg.speaker-2 path:nth-child(2) {
   fill: white;
 }
 
+/* ============================================================================
+   SEEKBAR (Progress Bar)
+   ============================================================================ */
+
+/* Seekbar container - holds time display and slider */
 .playstack-player-container .controls .seekbar {
   width: 100%;
   display: flex;
@@ -197,11 +255,14 @@
   gap: 0.25rem;
 }
 
+/* Time display text (current time / total time) */
 .playstack-player-container .controls .seekbar .time {
   font-size: 12px;
   color: white;
 }
 
+/* Slider root container - Radix UI slider component */
+/* Prevents text selection and touch scrolling during interaction */
 .playstack-player-container .controls .SliderRoot {
   position: relative;
   display: flex;
@@ -212,6 +273,7 @@
   height: 20px;
 }
 
+/* Slider track - background bar for the progress indicator */
 .playstack-player-container .controls .SliderTrack {
   background-color: rgba(153, 153, 153, 0.5);
   position: relative;
@@ -220,6 +282,8 @@
   height: 5px;
 }
 
+/* Loading progress indicator - animated bar showing buffered content */
+/* Only visible when seeking/loading */
 .playstack-player-container .controls .SliderTrack[data-seeking='true']::after {
   content: '';
   height: 5px;
@@ -230,6 +294,8 @@
   animation: progress 4s ease-in-out infinite;
 }
 
+/* Slider range - filled portion showing current progress */
+/* Uses theme color */
 .playstack-player-container .controls .SliderRange {
   position: absolute;
   background-color: var(--player-theme-color);
@@ -238,6 +304,7 @@
   z-index: 1;
 }
 
+/* Slider thumb - draggable handle on the progress bar */
 .playstack-player-container .controls .SliderThumb {
   display: block;
   width: 15px;
@@ -247,15 +314,22 @@
   cursor: pointer !important;
 }
 
+/* Focus state for slider thumb - accessibility indicator */
 .playstack-player-container .controls .SliderThumb:focus {
   outline: none;
   box-shadow: 0 0 0 5px color(display-p3 0 0 0/0.6);
 }
 
+/* ============================================================================
+   DROPDOWN MENUS (Settings, Quality, etc.)
+   ============================================================================ */
+
+/* Ensure dropdown menus appear above all other content */
 .playstack-player-container div[data-radix-popper-content-wrapper] {
   z-index: 100000 !important;
 }
 
+/* Dropdown menu container - white background with shadow */
 .playstack-player-container .DropdownMenuContent,
 .playstack-player-container .DropdownMenuSubContent {
   min-width: 150px;
@@ -268,16 +342,19 @@
   will-change: transform, opacity;
 }
 
+/* Right-aligned slot for icons in dropdown items */
 .playstack-player-container .RightSlot {
   margin-left: auto;
   padding-right: 5px;
 }
 
+/* Icon sizing in right slot */
 .playstack-player-container .RightSlot svg {
   height: 1.2rem;
   width: 1.2rem;
 }
 
+/* Dropdown menu items - checkbox items and submenu triggers */
 .playstack-player-container .DropdownMenuCheckboxItem,
 .playstack-player-container .DropdownMenuSubTrigger {
   font-size: 14px;
@@ -297,10 +374,12 @@
   cursor: pointer !important;
 }
 
+/* Submenu trigger - reduced left padding (no checkbox indicator) */
 .playstack-player-container .DropdownMenuSubTrigger {
   padding-left: 15px !important;
 }
 
+/* Checkbox indicator container - shows checkmark for selected items */
 .playstack-player-container .DropdownMenuItemIndicator {
   position: absolute;
   left: 0;
@@ -311,31 +390,50 @@
   padding: 2px;
 }
 
+/* Checkbox indicator icon sizing */
 .playstack-player-container .DropdownMenuItemIndicator svg {
   height: 1rem;
   width: 1rem;
 }
 
+/* Hover state for dropdown items - theme color background */
 .playstack-player-container .DropdownMenuCheckboxItem:hover,
 .playstack-player-container .DropdownMenuSubTrigger:hover {
   background-color: var(--player-theme-color);
   color: white;
 }
 
+/* ============================================================================
+   RESPONSIVE & ORIENTATION STYLES
+   ============================================================================ */
+
+/* Landscape orientation on small screens - constrain YouTube player width */
 @media screen and (orientation: landscape) and (min-height: 319px) and (max-height: 480px) {
   .playstack-player-container .youtube-player {
     max-width: 80vw;
   }
 }
 
+/* ============================================================================
+   YOUTUBE SHORTS SPECIFIC STYLES
+   ============================================================================ */
+
+/* YouTube Shorts - vertical aspect ratio (9:16) */
 .playstack-player-container:is(.youtube-shorts) {
   aspect-ratio: 9/16;
 }
 
+/* YouTube Shorts iframe - auto width */
 .playstack-player-container:is(.youtube-shorts) .iframe {
   width: auto !important;
 }
 
+/* ============================================================================
+   CUSTOM CONTROLS IFRAME STYLING
+   ============================================================================ */
+
+/* Custom controls mode - iframe scaling for YouTube Shorts, YouTube, and Vimeo */
+/* Uses oversized iframe with scaling to enable custom controls */
 .playstack-player-container:not(.default-controls):is(.youtube-shorts) iframe,
 .playstack-player-container:not(.default-controls):is(.youtube) iframe,
 .playstack-player-container:not(.default-controls):is(.vimeo) iframe {
@@ -346,33 +444,54 @@
   border: none !important;
 }
 
+/* YouTube custom controls - full width */
 .playstack-player-container:not(.default-controls):is(.youtube) iframe {
   width: 100% !important;
 }
 
+/* Vimeo custom controls - oversized and scaled down (10x scale) */
+/* This technique allows custom controls to overlay the video */
 .playstack-player-container:not(.default-controls):is(.vimeo) iframe {
   width: 1000% !important;
   scale: 0.1;
   margin-top: 1rem;
 }
 
+/* Vimeo player container adjustment for scaled iframe */
 .playstack-player-container:not(.default-controls):is(.vimeo) .vimeo-player {
   margin-top: -1rem;
 }
 
+/* ============================================================================
+   DEFAULT CONTROLS MODE
+   ============================================================================ */
+
+/* Default controls mode - standard iframe sizing */
 .playstack-player-container:is(.default-controls) iframe {
   width: 100% !important;
   height: 100% !important;
   border: none !important;
 }
 
+/* ============================================================================
+   PLAYER STATE STYLES
+   ============================================================================ */
+
+/* When player has started - show iframe */
 .playstack-player-container:is(.started) iframe {
   opacity: 1 !important;
 }
+
+/* YouTube player - hide iframe until started (when not using default controls) */
 .playstack-player-container:has(.youtube-player):not(.started):not(.default-controls) iframe {
   opacity: 0 !important;
 }
 
+/* ============================================================================
+   PLAYER WRAPPER STYLES
+   ============================================================================ */
+
+/* YouTube and Vimeo player wrappers - inherit all container properties */
 .playstack-player-container .youtube-player,
 .playstack-player-container .vimeo-player {
   display: inherit;
@@ -386,11 +505,17 @@
   height: inherit;
 }
 
+/* Vimeo player in fullscreen - allow auto height */
 .playstack-player-container:has(.fullscreen) .vimeo-player {
   height: auto !important;
 }
 
+/* ============================================================================
+   INTERACTION PREVENTION
+   ============================================================================ */
+
 /* Prevent iframe from being clicked when the player is started */
+/* This allows custom controls to handle interactions instead of the iframe */
 .playstack-player-container:not(.default-controls):is(.started) iframe {
   pointer-events: none;
 }

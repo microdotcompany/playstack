@@ -2,41 +2,49 @@ import { forwardRef, useContext, useEffect, useImperativeHandle, useRef } from '
 import { ContextProvider } from './player';
 import { waitForLibrary } from './helper/wait';
 
-// Global type declaration for the Bunny.net Player.js library
-// This allows TypeScript to recognize the playerjs object that gets loaded externally
+/**
+ * Props for the Bunny video player component
+ */
 interface props {
   src?: string;
   thumbnail?: string;
   id: string;
 }
 
-// Bunny.net video player component using forwardRef to expose player instance
+/**
+ * Bunny.net video player component that embeds a video using the Player.js API.
+ * Uses forwardRef to expose the player instance to parent components.
+ */
 export const Bunny = forwardRef(({ src, thumbnail, id }: props, ref) => {
-  // Reference to the iframe element that will contain the video player
+  // Reference to the iframe element that will host the Bunny.net video player
   const iframe = useRef<HTMLIFrameElement>(null);
 
+  // Reference to the Player.js instance for programmatic control
   const playerRef = useRef<any>(null);
 
+  // Access player state and setters from the context provider
   const { setDuration, setCurrentTime, ready, setReady } = useContext(ContextProvider);
 
+  // Initialize iframe background to transparent when component mounts or id changes
   useEffect(() => {
-    // Set iframe background to transparent initially
     if (iframe.current) iframe.current.style.background = 'transparent';
   }, [id]);
 
-  // Effect to initialize the Bunny.net player when source changes
+  // Initialize the Bunny.net player when the video source changes
   useEffect(() => {
     if (src) {
+      // Wait for the Player.js library to load before initializing
       waitForLibrary('playerjs')
         .then(() => {
           // Create new player instance with the iframe element
           playerRef.current = new window.playerjs.Player(iframe.current);
 
-          // Set up event listeners when player is ready
+          // Register event handlers when the player is ready
           playerRef.current.on('ready', () => {
             setReady(true);
-            // Change iframe background to black when player is ready
+            // Set iframe background to black once the player is ready
             if (iframe.current) iframe.current.style.background = 'black';
+            // Fetch and set the video duration
             playerRef.current.getDuration((duration: number) => setDuration(duration));
 
             // Listen for time updates and call the callback with current time and duration
@@ -60,6 +68,7 @@ export const Bunny = forwardRef(({ src, thumbnail, id }: props, ref) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src]);
 
+  // Expose the player instance to parent components via ref
   useImperativeHandle(
     ref,
     () => ({

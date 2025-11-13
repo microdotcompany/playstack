@@ -17,40 +17,54 @@ import Video from './video';
 import { Bunny } from './bunny';
 import { GDrive } from './gdrive';
 
-// Global type declaration for the HLS, Vimeo, and YouTube players
+/**
+ * Global type declarations for third-party video player libraries
+ * These are loaded dynamically at runtime and need to be declared globally
+ * to avoid TypeScript errors when accessing window properties
+ */
 declare global {
   interface Window {
-    Hls: any;
-    Vimeo: any;
-    onYouTubeIframeAPIReady?: () => void;
-    YT: any;
-    dashjs: any;
-    playerjs: any;
+    Hls: any; // HLS.js library for HTTP Live Streaming
+    Vimeo: any; // Vimeo Player SDK
+    YT: any; // YouTube IFrame API
+    dashjs: any; // DASH.js library for MPEG-DASH streaming
+    playerjs: any; // Player.js library for Bunny.net player
   }
 }
 
+/**
+ * Player component props interface
+ * Defines all configurable options and event callbacks for the video player
+ */
 export interface PlayerProps {
-  src: string;
+  src: string; // Video source URL
   config?: {
     bunny?: {
-      id: string;
-      hostname: string;
+      id: string; // Bunny.net video ID
+      hostname: string; // Bunny.net CDN hostname
     };
-    theme?: string;
-    defaultControls?: boolean;
-    hidePlayerControls?: boolean;
+    theme?: string; // CSS custom property for player theme color
+    defaultControls?: boolean; // Use native browser/iframe controls instead of custom controls
+    hidePlayerControls?: boolean; // Hide custom player controls entirely
   };
-  onTimeUpdate?: (time: { current: number; duration: number }) => void;
-  onDurationChange?: (duration: number) => void;
-  onTitleChange?: (title?: string) => void;
-  onReady?: (player: any) => void;
-  onVolumeChange?: (data: { volume: number; muted: boolean }) => void; // it wont work on bunny and gdrive
-  onPlaybackRateChange?: (playbackRate: number) => void; // it wont work on bunny and gdrive
+  onTimeUpdate?: (time: { current: number; duration: number }) => void; // Fires when playback time updates
+  onDurationChange?: (duration: number) => void; // Fires when video duration is available
+  onTitleChange?: (title?: string) => void; // Fires when video title is available
+  onReady?: (player: any) => void; // Fires when player is ready
+  onVolumeChange?: (data: { volume: number; muted: boolean }) => void; // Fires when volume/mute changes (not supported on bunny and gdrive)
+  onPlaybackRateChange?: (playbackRate: number) => void; // Fires when playback speed changes (not supported on bunny and gdrive)
 }
 
+/**
+ * React Context for sharing player state between Player component and child components
+ * Used by Controls, Overlay, and individual player implementations
+ */
 // eslint-disable-next-line react-refresh/only-export-components
 export const ContextProvider = createContext<any>({});
 
+/**
+ * Default player options applied on initialization
+ */
 const defaultOptions = {
   volume: 0.5,
   muted: false
@@ -70,17 +84,23 @@ export const Player = forwardRef(
     }: PlayerProps,
     ref: any
   ) => {
-    // detect if the device is iOS
+    /**
+     * iOS Detection Logic
+     * Detects iOS devices including iPad (which reports as MacIntel in newer iOS versions)
+     * This is important because iOS has special handling for video playback and volume control
+     */
     const isIOS =
       /iPad|iPhone|iPod/.test(navigator.userAgent) ||
       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
+    // Ref to the actual player instance (Youtube, Vimeo, Video, etc.)
     const playerRef = useRef<any>(null);
 
+    // Ref to the container div for positioning and fullscreen functionality
     const containerRef = useRef<HTMLDivElement>(null);
 
+    // Player state management
     const [ready, setReady] = useState<boolean>(false);
-
     const [duration, setDuration] = useState<number>(0);
     const [currentTime, setCurrentTime] = useState<number>(0);
     const [state, setState] = useState<string>('paused');
@@ -88,9 +108,22 @@ export const Player = forwardRef(
     const [volume, setVolume] = useState<number>(0.5);
     const [muted, setMuted] = useState<boolean>(false);
     const [playbackRate, setPlaybackRate] = useState<number>(1);
-
     const [error, setError] = useState<any>(null);
 
+    /**
+     * Video Service Detection and Parsing
+     * This memoized value parses the video source URL to determine:
+     * - Which service provider (YouTube, Vimeo, Bunny, Google Drive, or generic)
+     * - The video ID for that service
+     * - The thumbnail URL (if available)
+     *
+     * Processing order:
+     * 1. Bunny.net videos (requires config.bunny)
+     * 2. URL validation (must be HTTPS or blob URL)
+     * 3. Google Drive URLs (custom regex parsing)
+     * 4. YouTube/Vimeo (via get-video-id library)
+     * 5. Generic video URLs (fallback)
+     */
     const video: {
       thumbnail?: string;
       service?: string;
@@ -100,7 +133,7 @@ export const Player = forwardRef(
       const { bunny } = config || {};
 
       if (src || bunny?.id) {
-        // Handle Bunny video service
+        // Handle Bunny video service (requires explicit config)
         if (bunny?.id)
           return {
             thumbnail: `https://${bunny.hostname}/${bunny.id}/thumbnail.jpg`,
@@ -109,13 +142,16 @@ export const Player = forwardRef(
             id: bunny.id
           };
 
-        // Only allow valid HTTPS URLs or blob URLs for video sources; otherwise, return null
+        // Security: Only allow valid HTTPS URLs or blob URLs for video sources
+        // Prevents XSS attacks and ensures secure video loading
         if (!src || !(src.startsWith('https://') || src.startsWith('blob:'))) return null;
 
-        // Parse video URL to extract service and ID
+        // Parse video URL to extract service and ID using get-video-id library
+        // Supports YouTube and Vimeo out of the box
         const videoData = getVideoId(src);
 
-        // Handle Google Drive URLs (not supported by get-video-id)
+        // Handle Google Drive URLs (not supported by get-video-id library)
+        // Uses custom regex to extract file ID from various Google Drive URL formats
         if (!videoData.service && !videoData.id) {
           const pattern =
             // eslint-disable-next-line no-useless-escape
@@ -123,7 +159,7 @@ export const Player = forwardRef(
           const match = src.match(pattern);
 
           if (match) {
-            // drive video id
+            // Extract Google Drive file ID and construct preview URL
             const id = match[1];
             return {
               service: 'gdrive',
@@ -132,6 +168,7 @@ export const Player = forwardRef(
             };
           }
 
+          // Fallback: Treat as generic video URL
           return {
             service: 'other',
             src,
@@ -139,13 +176,15 @@ export const Player = forwardRef(
           };
         }
 
-        // if no id, return null
+        // Validation: If get-video-id couldn't extract an ID, return null
         if (!videoData.id) return null;
 
-        // Handle YouTube Shorts (convert to regular YouTube URL)
+        // Special handling for YouTube Shorts
+        // YouTube Shorts use a different URL format but can be played with regular YouTube player
         const ytShorts = videoData.service === 'youtube' && src.includes('shorts');
 
         return {
+          // Generate YouTube thumbnail URL if available
           thumbnail:
             videoData.service === 'youtube'
               ? `https://i.ytimg.com/vi/${videoData.id}/sddefault.jpg`
@@ -159,6 +198,10 @@ export const Player = forwardRef(
       return null;
     }, [src, config]);
 
+    /**
+     * Reset player state when video source changes
+     * This ensures clean state when switching between videos
+     */
     useEffect(() => {
       setDuration(0);
       setCurrentTime(0);
@@ -171,6 +214,10 @@ export const Player = forwardRef(
       setError(null);
     }, [video]);
 
+    /**
+     * Apply theme color to CSS custom property
+     * Allows dynamic theming of player controls via CSS
+     */
     useEffect(() => {
       document.documentElement.style.setProperty(
         '--player-theme-color',
@@ -178,11 +225,19 @@ export const Player = forwardRef(
       );
     }, [config]);
 
+    /**
+     * Callback: Notify parent component of time updates
+     * Fires whenever currentTime or duration changes
+     */
     useEffect(() => {
       if (onTimeUpdate) onTimeUpdate({ current: currentTime, duration: duration });
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [duration, currentTime]);
 
+    /**
+     * Callback: Notify parent component of duration changes
+     * Also attempts to fetch and notify video title when player is ready
+     */
     useEffect(() => {
       if (onDurationChange) onDurationChange(duration);
 
@@ -193,28 +248,45 @@ export const Player = forwardRef(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [duration, ready]);
 
+    /**
+     * Initialize player settings when ready
+     * Sets default volume and mute state, and calls onReady callback
+     * Note: iOS requires volume to be set to 1 due to platform restrictions
+     */
     useEffect(() => {
       if (ready) {
         if (playerRef.current) {
+          // iOS doesn't allow programmatic volume control, must be set to 1
           playerRef.current.setVolume?.(isIOS ? 1 : defaultOptions.volume);
           playerRef.current.setMuted?.(defaultOptions.muted);
         }
 
+        // Call onReady callback only once (when started is false)
         if (onReady && !started) onReady(playerRef.current);
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [ready, started, playerRef, isIOS]);
 
+    /**
+     * Callback: Notify parent component of volume/mute changes
+     */
     useEffect(() => {
       if (onVolumeChange) onVolumeChange({ volume, muted });
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [volume, muted]);
 
+    /**
+     * Callback: Notify parent component of playback rate changes
+     */
     useEffect(() => {
       if (onPlaybackRateChange) onPlaybackRateChange(playbackRate);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [playbackRate]);
 
+    /**
+     * Expose player instance to parent component via ref
+     * Allows parent to control player programmatically (play, pause, seek, etc.)
+     */
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useImperativeHandle(ref, () => playerRef.current, [playerRef, ready]);
 
@@ -248,6 +320,10 @@ export const Player = forwardRef(
             config?.defaultControls || error ? 'default-controls' : ''
           }`}
         >
+          {/**
+           * Conditional rendering of video player components based on detected service
+           * Each service has its own implementation with different capabilities
+           */}
           {video?.service === 'youtube' || video?.service === 'youtube-shorts' ? (
             <Youtube
               ref={playerRef}
@@ -267,14 +343,26 @@ export const Player = forwardRef(
           ) : video?.service === 'gdrive' ? (
             <GDrive src={video.src} ref={playerRef} />
           ) : (
+            // Generic HTML5 video player for direct video URLs and HLS/DASH streams
             video?.src && <Video src={video.src} ref={playerRef} />
           )}
 
+          {/**
+           * Conditional rendering of custom controls and overlay
+           * Only shown when:
+           * - defaultControls is false (not using native controls)
+           * - hidePlayerControls is false (controls not explicitly hidden)
+           * - Service is not bunny or gdrive (these have built-in controls)
+           */}
           {!config?.defaultControls &&
             !config?.hidePlayerControls &&
             video?.service !== 'bunny' &&
             video?.service !== 'gdrive' && (
               <>
+                {/**
+                 * Overlay component: Handles play button, loading states, and click-to-play
+                 * deferToIframeControls: For YouTube/Vimeo, let iframe handle initial play
+                 */}
                 <Overlay
                   deferToIframeControls={
                     video?.service === 'vimeo' ||
@@ -284,6 +372,10 @@ export const Player = forwardRef(
                   thumbnail={video?.thumbnail}
                   player={playerRef}
                 />
+                {/**
+                 * Controls component: Custom playback controls (play/pause, seek, volume, etc.)
+                 * showFullscreenOnIOS: Enable fullscreen button on iOS for generic video player
+                 */}
                 <Controls
                   container={containerRef}
                   player={playerRef}

@@ -367,7 +367,15 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Support
 
-For issues and questions:
+Need help? We're here to assist you!
 
-1. Review the [Bunny Stream documentation](https://docs.bunny.net/docs/stream-embedding-videos)
-2. Open an issue in this repository
+- **🐛 Bug Reports**: Found a bug? Please [open an issue](https://github.com/your-username/playstack/issues) with a detailed description, steps to reproduce, and your environment details.
+- **💡 Feature Requests**: Have an idea for a new feature? We'd love to hear it! [Open a feature request](https://github.com/your-username/playstack/issues).
+- **❓ Questions**: For general questions and discussions, check existing [issues](https://github.com/your-username/playstack/issues) or start a new discussion.
+- **📖 Documentation**: Make sure to check the [API Reference](#api-reference) and [Examples](#quick-start) sections above.
+
+**Before opening an issue**, please:
+
+- Search existing issues to see if your question has already been answered
+- Include relevant code examples and error messages
+- Specify which platform(s) you're experiencing issues with (YouTube, Vimeo, Bunny Stream, etc.)

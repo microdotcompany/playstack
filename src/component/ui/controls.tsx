@@ -16,6 +16,8 @@ import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'r
 import { ContextProvider } from '../player';
 import screenfull from 'screenfull';
 
+// Controls component for the video player
+// Manages UI controls, keyboard shortcuts, and user interactions
 export const Controls = ({
   player,
   showFullscreenOnIOS,
@@ -25,17 +27,24 @@ export const Controls = ({
   showFullscreenOnIOS: boolean;
   container: React.RefObject<HTMLDivElement>;
 }) => {
+  // Reference to store the timeout ID for auto-hiding controls
   const timeoutControls = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // State to track whether controls should be visible
   const [activeControls, setActiveControls] = useState<boolean>(false);
 
+  // Get player state and properties from context
   const { started, state, currentTime, duration, isIOS, volume, muted, playbackRate } =
     useContext(ContextProvider);
 
+  // State to track fullscreen mode
   const [fullscreen, setFullscreen] = useState<boolean>(false);
 
+  // Memoized value to determine if player is paused
   const paused = useMemo(() => state === 'paused', [state]);
 
+  // Calculate remaining time in a human-readable format (days:hours:minutes:seconds)
+  // Handles videos longer than 24 hours by including days and hours when needed
   const remainingTime = useMemo(() => {
     let remaining = Math.max(0, Math.floor(duration - currentTime));
     const days = Math.floor(remaining / 86400);
@@ -54,6 +63,7 @@ export const Controls = ({
     return parts.join(':');
   }, [currentTime, duration]);
 
+  // Toggle play/pause state of the player
   const togglePlay = useCallback(() => {
     if (paused) {
       player.current.play();
@@ -62,6 +72,7 @@ export const Controls = ({
     }
   }, [paused, player]);
 
+  // Effect to handle fullscreen changes and auto-hide controls on user interaction
   useEffect(() => {
     const main = container.current;
 
@@ -84,6 +95,7 @@ export const Controls = ({
     // Add event listeners
     main.addEventListener('fullscreenchange', onFullscreenChange);
 
+    // Show controls on mouse/touch interactions
     main.addEventListener('mouseenter', onScreenEvent);
     main.addEventListener('mousemove', onScreenEvent);
     main.addEventListener('touchstart', onScreenEvent);
@@ -101,9 +113,12 @@ export const Controls = ({
     };
   }, [container, player]);
 
+  // Effect to handle keyboard shortcuts for player control
+  // Only active when player has started (currentTime >= 1 second)
   useEffect(() => {
     // Keyboard shortcuts for player control
     const onKeydown = (e: KeyboardEvent) => {
+      // Only process keyboard shortcuts if player is initialized and has started
       if (player.current && currentTime >= 1) {
         switch (e.code) {
           case 'Space': {
@@ -142,7 +157,9 @@ export const Controls = ({
       }
     };
 
+    // Attach keyboard event listener to document body
     document.body.addEventListener('keydown', onKeydown);
+    // Cleanup: remove event listener on unmount or dependency change
     return () => document.body.removeEventListener('keydown', onKeydown);
   }, [togglePlay, currentTime, duration, volume, muted, player]);
 
@@ -305,11 +322,14 @@ export const Controls = ({
         {(!isIOS || showFullscreenOnIOS) && (
           <button
             onClick={() => {
+              // Handle fullscreen toggle differently for iOS vs other platforms
               if (isIOS) {
+                // iOS requires native video element fullscreen API
                 const videoEl = player.current.instance();
 
                 if (!videoEl) return;
 
+                // Try standard requestFullscreen first, fallback to webkitEnterFullscreen for iOS Safari
                 const enter =
                   videoEl.requestFullscreen?.bind(videoEl) ??
                   (videoEl as any).webkitEnterFullscreen?.bind(videoEl);
@@ -319,6 +339,7 @@ export const Controls = ({
                   console.warn('Fullscreen API is not available on this device.');
                 }
               } else {
+                // For non-iOS devices, use screenfull library to toggle fullscreen on the container
                 if (screenfull.isFullscreen) {
                   screenfull.exit();
                 } else {
