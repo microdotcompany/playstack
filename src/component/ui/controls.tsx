@@ -20,11 +20,11 @@ import screenfull from 'screenfull';
 // Manages UI controls, keyboard shortcuts, and user interactions
 export const Controls = ({
   player,
-  showFullscreenOnIOS,
+  service,
   container
 }: {
   player: any;
-  showFullscreenOnIOS: boolean;
+  service?: string;
   container: React.RefObject<HTMLDivElement>;
 }) => {
   // Reference to store the timeout ID for auto-hiding controls
@@ -42,6 +42,12 @@ export const Controls = ({
 
   // Memoized value to determine if player is paused
   const paused = useMemo(() => state === 'paused', [state]);
+
+  // Memoized value to determine if only the seekbar should be shown
+  const onlyShowSeekbar = useMemo(
+    () => isIOS && (service === 'youtube' || service === 'youtube-shorts'),
+    [isIOS, service]
+  );
 
   // Calculate remaining time in a human-readable format (days:hours:minutes:seconds)
   // Handles videos longer than 24 hours by including days and hours when needed
@@ -175,7 +181,12 @@ export const Controls = ({
         {paused ? <IconPlayerPlayFilled /> : <IconPlayerPauseFilled />}
       </button>
 
-      <div className="seekbar">
+      <div
+        className="seekbar"
+        style={{
+          paddingRight: onlyShowSeekbar ? '.75rem' : undefined
+        }}
+      >
         <Slider.Root
           className="SliderRoot"
           value={[currentTime]}
@@ -203,27 +214,30 @@ export const Controls = ({
         <span className="time">-{remainingTime}</span>
       </div>
 
-      <button
-        style={{ marginRight: isIOS ? '-.4rem' : undefined }}
-        onClick={() => {
-          if (volume <= 0) {
-            player.current.setMuted(false);
-            player.current.setVolume(0.1);
-          } else {
-            player.current.setMuted(!muted);
-          }
-        }}
-      >
-        {!(volume <= 0 || muted) ? (
-          volume <= 0.5 ? (
-            <IconVolume2 className="speaker-2" />
+      {!onlyShowSeekbar && (
+        <button
+          style={{ marginRight: isIOS ? '-.4rem' : undefined }}
+          onClick={() => {
+            if (volume <= 0) {
+              player.current.setMuted(false);
+              player.current.setVolume(0.1);
+            } else {
+              player.current.setMuted(!muted);
+            }
+          }}
+        >
+          {!(volume <= 0 || muted) ? (
+            volume <= 0.5 ? (
+              <IconVolume2 className="speaker-2" />
+            ) : (
+              <IconVolume className="speaker" />
+            )
           ) : (
-            <IconVolume className="speaker" />
-          )
-        ) : (
-          <IconVolumeOff className="speaker" />
-        )}
-      </button>
+            <IconVolumeOff className="speaker" />
+          )}
+        </button>
+      )}
+
       {!isIOS && (
         <div className="seekbar" style={{ maxWidth: '5rem' }}>
           <Slider.Root
@@ -243,115 +257,118 @@ export const Controls = ({
           </Slider.Root>
         </div>
       )}
-      <div className="group-btn-controls">
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger asChild>
-            <button>
-              <IconSettingsFilled />
+
+      {!onlyShowSeekbar && (
+        <div className="group-btn-controls">
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger asChild>
+              <button>
+                <IconSettingsFilled />
+              </button>
+            </DropdownMenu.Trigger>
+
+            <DropdownMenu.Portal container={container.current}>
+              <DropdownMenu.Content className="DropdownMenuContent" side="top" sideOffset={5}>
+                <DropdownMenu.Sub>
+                  <DropdownMenu.SubTrigger className="DropdownMenuSubTrigger">
+                    Speed
+                    <div className="RightSlot">
+                      <IconChevronRight />
+                    </div>
+                  </DropdownMenu.SubTrigger>
+                  <DropdownMenu.Portal container={container.current}>
+                    <DropdownMenu.SubContent
+                      className="DropdownMenuSubContent"
+                      sideOffset={2}
+                      alignOffset={-5}
+                    >
+                      {[
+                        {
+                          value: 0.25,
+                          label: '0.25x'
+                        },
+                        {
+                          value: 0.5,
+                          label: '0.5x'
+                        },
+                        {
+                          value: 0.75,
+                          label: '0.75x'
+                        },
+                        {
+                          value: 1,
+                          label: 'Normal'
+                        },
+                        {
+                          value: 1.25,
+                          label: '1.25x'
+                        },
+                        {
+                          value: 1.5,
+                          label: '1.5x'
+                        },
+                        {
+                          value: 1.75,
+                          label: '1.75x'
+                        },
+                        {
+                          value: 2,
+                          label: '2x'
+                        }
+                      ].map((v) => (
+                        <DropdownMenu.CheckboxItem
+                          key={v.value}
+                          className="DropdownMenuCheckboxItem"
+                          checked={v.value === playbackRate ? true : false}
+                          onCheckedChange={() => player.current.setPlaybackRate(v.value)}
+                        >
+                          <DropdownMenu.ItemIndicator className="DropdownMenuItemIndicator">
+                            <IconCircleCheckFilled />
+                          </DropdownMenu.ItemIndicator>
+                          {v.label}
+                        </DropdownMenu.CheckboxItem>
+                      ))}
+                    </DropdownMenu.SubContent>
+                  </DropdownMenu.Portal>
+                </DropdownMenu.Sub>
+              </DropdownMenu.Content>
+            </DropdownMenu.Portal>
+          </DropdownMenu.Root>
+
+          {(!isIOS || (service as any) === 'other') && (
+            <button
+              onClick={() => {
+                // Handle fullscreen toggle differently for iOS vs other platforms
+                if (isIOS) {
+                  // iOS requires native video element fullscreen API
+                  const videoEl = player.current.instance();
+
+                  if (!videoEl) return;
+
+                  // Try standard requestFullscreen first, fallback to webkitEnterFullscreen for iOS Safari
+                  const enter =
+                    videoEl.requestFullscreen?.bind(videoEl) ??
+                    (videoEl as any).webkitEnterFullscreen?.bind(videoEl);
+                  if (enter) {
+                    enter();
+                  } else {
+                    console.warn('Fullscreen API is not available on this device.');
+                  }
+                } else {
+                  // For non-iOS devices, use screenfull library to toggle fullscreen on the container
+                  if (screenfull.isFullscreen) {
+                    screenfull.exit();
+                  } else {
+                    screenfull.request(container.current as any);
+                  }
+                }
+              }}
+            >
+              {fullscreen ? <IconArrowsMinimize /> : <IconArrowsMaximize />}
             </button>
-          </DropdownMenu.Trigger>
-
-          <DropdownMenu.Portal container={container.current}>
-            <DropdownMenu.Content className="DropdownMenuContent" side="top" sideOffset={5}>
-              <DropdownMenu.Sub>
-                <DropdownMenu.SubTrigger className="DropdownMenuSubTrigger">
-                  Speed
-                  <div className="RightSlot">
-                    <IconChevronRight />
-                  </div>
-                </DropdownMenu.SubTrigger>
-                <DropdownMenu.Portal container={container.current}>
-                  <DropdownMenu.SubContent
-                    className="DropdownMenuSubContent"
-                    sideOffset={2}
-                    alignOffset={-5}
-                  >
-                    {[
-                      {
-                        value: 0.25,
-                        label: '0.25x'
-                      },
-                      {
-                        value: 0.5,
-                        label: '0.5x'
-                      },
-                      {
-                        value: 0.75,
-                        label: '0.75x'
-                      },
-                      {
-                        value: 1,
-                        label: 'Normal'
-                      },
-                      {
-                        value: 1.25,
-                        label: '1.25x'
-                      },
-                      {
-                        value: 1.5,
-                        label: '1.5x'
-                      },
-                      {
-                        value: 1.75,
-                        label: '1.75x'
-                      },
-                      {
-                        value: 2,
-                        label: '2x'
-                      }
-                    ].map((v) => (
-                      <DropdownMenu.CheckboxItem
-                        key={v.value}
-                        className="DropdownMenuCheckboxItem"
-                        checked={v.value === playbackRate ? true : false}
-                        onCheckedChange={() => player.current.setPlaybackRate(v.value)}
-                      >
-                        <DropdownMenu.ItemIndicator className="DropdownMenuItemIndicator">
-                          <IconCircleCheckFilled />
-                        </DropdownMenu.ItemIndicator>
-                        {v.label}
-                      </DropdownMenu.CheckboxItem>
-                    ))}
-                  </DropdownMenu.SubContent>
-                </DropdownMenu.Portal>
-              </DropdownMenu.Sub>
-            </DropdownMenu.Content>
-          </DropdownMenu.Portal>
-        </DropdownMenu.Root>
-
-        {(!isIOS || showFullscreenOnIOS) && (
-          <button
-            onClick={() => {
-              // Handle fullscreen toggle differently for iOS vs other platforms
-              if (isIOS) {
-                // iOS requires native video element fullscreen API
-                const videoEl = player.current.instance();
-
-                if (!videoEl) return;
-
-                // Try standard requestFullscreen first, fallback to webkitEnterFullscreen for iOS Safari
-                const enter =
-                  videoEl.requestFullscreen?.bind(videoEl) ??
-                  (videoEl as any).webkitEnterFullscreen?.bind(videoEl);
-                if (enter) {
-                  enter();
-                } else {
-                  console.warn('Fullscreen API is not available on this device.');
-                }
-              } else {
-                // For non-iOS devices, use screenfull library to toggle fullscreen on the container
-                if (screenfull.isFullscreen) {
-                  screenfull.exit();
-                } else {
-                  screenfull.request(container.current as any);
-                }
-              }
-            }}
-          >
-            {fullscreen ? <IconArrowsMinimize /> : <IconArrowsMaximize />}
-          </button>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

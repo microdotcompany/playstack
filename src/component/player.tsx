@@ -374,13 +374,8 @@ export const Player = forwardRef(
                 />
                 {/**
                  * Controls component: Custom playback controls (play/pause, seek, volume, etc.)
-                 * showFullscreenOnIOS: Enable fullscreen button on iOS for generic video player
                  */}
-                <Controls
-                  container={containerRef}
-                  player={playerRef}
-                  showFullscreenOnIOS={isIOS && video?.service === 'other'}
-                />
+                <Controls container={containerRef} player={playerRef} service={video?.service} />
               </>
             )}
         </div>
