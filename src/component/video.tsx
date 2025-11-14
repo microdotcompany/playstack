@@ -13,6 +13,11 @@ import { loadLibrary } from './helper/load';
 const Video = forwardRef(({ src }: { src: string }, ref: any) => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  // References to the HLS player instances
+  const hlsRef = useRef<any>(null);
+  // Reference to the DASH player instance
+  const dashRef = useRef<any>(null);
+
   // Get state setters from the player context to sync video state
   const {
     setDuration,
@@ -56,9 +61,9 @@ const Video = forwardRef(({ src }: { src: string }, ref: any) => {
         loadLibrary('Hls')
           .then(() => {
             if (window.Hls.isSupported()) {
-              const hls = new window.Hls();
-              hls.loadSource(url);
-              hls.attachMedia(videoRef.current);
+              hlsRef.current = new window.Hls();
+              hlsRef.current.loadSource(url);
+              hlsRef.current.attachMedia(videoRef.current);
             }
           })
           .catch((error) => {
@@ -69,8 +74,8 @@ const Video = forwardRef(({ src }: { src: string }, ref: any) => {
       // DASH (Dynamic Adaptive Streaming over HTTP) format
       loadLibrary('dashjs')
         .then(() => {
-          const player = window.dashjs.MediaPlayer().create();
-          player.initialize(videoRef.current, src, false);
+          dashRef.current = window.dashjs.MediaPlayer().create();
+          dashRef.current.initialize(videoRef.current, src, false);
         })
         .catch((error) => {
           console.error(error);
@@ -175,7 +180,11 @@ const Video = forwardRef(({ src }: { src: string }, ref: any) => {
 
     // Cleanup: remove all event listeners when component unmounts or src changes
     return () => {
+      if (hlsRef.current) hlsRef.current.destroy();
+      if (dashRef.current) dashRef.current.destroy();
+
       if (!videoRef.current) return;
+
       videoRef.current.removeEventListener('canplay', onCanPlay);
       videoRef.current.removeEventListener('timeupdate', onTimeUpdate);
       videoRef.current.removeEventListener('play', onPlay);
@@ -250,9 +259,15 @@ const Video = forwardRef(({ src }: { src: string }, ref: any) => {
        *
        * @returns The video element or null if not available
        */
-      instance: () => videoRef.current
+      instance: () => {
+        const instance = videoRef.current;
+        // Set the HLS and DASH player instances on the video element
+        if (hlsRef.current && instance) (instance as any).hls = hlsRef.current;
+        if (dashRef.current && instance) (instance as any).dashjs = dashRef.current;
+        return instance;
+      }
     }),
-    [videoRef]
+    [videoRef, hlsRef, dashRef]
   );
 
   return (
