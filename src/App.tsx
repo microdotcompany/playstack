@@ -5,7 +5,7 @@ import { useRef, useState } from 'react';
 // The player works with a sample YouTube video URL
 const App = () => {
   const playerRef = useRef<any>(null);
-  const [src, setSrc] = useState('https://youtu.be/K-NDA_QpVYA');
+  const [src, setSrc] = useState('https://youtu.be/mN0zPOpADL4?si=zAGBEq2ZbICSJpJw');
   const [customMode, setCustomMode] = useState(false);
   const [customUrl, setCustomUrl] = useState('');
 
@@ -29,8 +29,11 @@ const App = () => {
         {!customMode ? (
           <>
             {[
-              { label: 'YouTube 1', url: 'https://youtu.be/K-NDA_QpVYA' },
-              { label: 'YouTube 2', url: 'https://www.youtube.com/watch?v=_cMxraX_5RE' },
+              { label: 'YouTube 1', url: 'https://youtu.be/mN0zPOpADL4?si=zAGBEq2ZbICSJpJw' },
+              {
+                label: 'YouTube 2',
+                url: 'https://www.youtube.com/watch?v=WhWc3b3KhnY?si=UE6UvzXPLqvfCo8X'
+              },
               { label: 'YouTube Shorts', url: 'https://www.youtube.com/shorts/tLZjL-dMH_g' },
               { label: 'Vimeo', url: 'https://vimeo.com/90509568' },
               {
@@ -43,7 +46,7 @@ const App = () => {
               },
               {
                 label: 'DASH',
-                url: 'https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps_640x360_800k.mpd'
+                url: 'https://files.vidstack.io/sprite-fight/dash/stream.mpd'
               },
               {
                 label: 'HLS',
