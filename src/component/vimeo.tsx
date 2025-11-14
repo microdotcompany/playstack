@@ -138,6 +138,7 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
             playerRef.current.on('pause', onPause);
             playerRef.current.on('ended', onEnded);
             playerRef.current.on('bufferstart', onBuffering);
+            playerRef.current.on('seeked', onPlay);
             playerRef.current.on('bufferend', onPlay);
             playerRef.current.on('timeupdate', onTimeUpdate);
             playerRef.current.on('error', onError);
@@ -188,6 +189,10 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
         });
       },
       seekTo: (time: number) => {
+        // when manual seeking the bufferstart wont trigger so we need to set the state to buffering manually when seek completed the event will trigger and set the state to playing
+        setState('buffering');
+        // set the current time in the context to the new time - it will make sure the seekbar is updated immediately (improve user experience)
+        setCurrentTime(time);
         playerRef.current?.setCurrentTime(time);
       },
       setMuted: (muted: boolean) => {
@@ -198,6 +203,7 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
       },
       instance: () => playerRef.current
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [playerRef]
   );
 

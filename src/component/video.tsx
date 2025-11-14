@@ -202,7 +202,11 @@ const Video = forwardRef(({ src }: { src: string }, ref: any) => {
         videoRef.current?.pause();
       },
       seekTo: (time: number) => {
-        if (videoRef.current) videoRef.current.currentTime = time;
+        if (videoRef.current) {
+          // set the current time in the context to the new time - it will make sure the seekbar is updated immediately (improve user experience)
+          setCurrentTime(time);
+          videoRef.current.currentTime = time;
+        }
       },
       setVolume: (volume: number) => {
         if (videoRef.current) videoRef.current.volume = volume;

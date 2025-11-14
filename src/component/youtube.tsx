@@ -176,6 +176,8 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
         });
       },
       seekTo: (time: number) => {
+        // set the current time in the context to the new time - it will make sure the seekbar is updated immediately (improve user experience)
+        setCurrentTime(time);
         // Seek to time (second parameter true = allow seeking before video is loaded)
         playerRef.current?.seekTo(time, true);
       },
@@ -191,6 +193,7 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
       },
       instance: () => playerRef.current
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [playerRef]
   );
 
