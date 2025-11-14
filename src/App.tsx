@@ -42,15 +42,15 @@ const App = () => {
               },
               {
                 label: 'Mux 2',
-                url: 'https://stream.mux.com/v69RSHhFelSm4701snP22dYz2jICy4E4FUyk02rW4gxRM.m3u8'
+                url: 'https://stream.mux.com/Sc89iWAyNkhJ3P1rQ02nrEdCFTnfT01CZ2KmaEcxXfB008'
               },
               {
                 label: 'DASH',
-                url: 'https://files.vidstack.io/sprite-fight/dash/stream.mpd'
+                url: 'https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd'
               },
               {
                 label: 'HLS',
-                url: 'https://files.vidstack.io/sprite-fight/hls/stream.m3u8'
+                url: 'https://stream.mux.com/VcmKA6aqzIzlg3MayLJDnbF55kX00mds028Z65QxvBYaA.m3u8'
               },
               {
                 label: 'HTML',
