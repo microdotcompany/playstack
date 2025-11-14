@@ -47,6 +47,15 @@ export const loadLibrary = (
       script.type = 'text/javascript';
       // Set async attribute if specified in the script configuration
       if ((source as any).async) script.async = true;
+
+      // on load set the library to loaded
+      script.onload = () => {
+        // set the library to loaded
+        return (window as any).playerLoaded
+          ? ((window as any).playerLoaded[library] = true)
+          : ((window as any).playerLoaded = { [library]: true });
+      };
+
       document.head.appendChild(script);
     }
 
@@ -58,7 +67,8 @@ export const loadLibrary = (
      */
     const check = () => {
       // Success: the library is now present on window → resolve the promise
-      if (typeof window[library as keyof Window] !== 'undefined') {
+      if ((window as any).playerLoaded?.[library]) {
+        console.log(`${library} loaded`);
         resolve();
       } else if (Date.now() - startTime > timeout) {
         // Failure: we have waited longer than the allowed timeout → reject
