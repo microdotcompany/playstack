@@ -112,47 +112,49 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
     // Wait for YouTube IFrame API to load, then initialize player
     loadLibrary('YT')
       .then(() => {
-        const div = document.createElement('div');
+        window.YT.ready(() => {
+          const div = document.createElement('div');
 
-        // Remove existing player if present (handles re-initialization)
-        if (youtubePlayerRef.current?.firstChild) {
-          youtubePlayerRef.current.firstChild.remove();
-        }
-
-        youtubePlayerRef.current?.appendChild(div);
-
-        // Initialize YouTube Player with configuration
-        playerRef.current = new window.YT.Player(div, {
-          videoId: id,
-          // Use regular YouTube domain for shorts, nocookie domain for regular videos
-          host:
-            service === 'youtube-shorts'
-              ? 'https://www.youtube.com'
-              : 'https://www.youtube-nocookie.com',
-          playerVars: {
-            playsinline: isIOS ? 0 : 1,
-            cc_load_policy: 0,
-            cc_lang_pref: 'en',
-            controls: defaultControls ? 1 : 0,
-            disablekb: defaultControls ? 0 : 1,
-            fs: defaultControls || isIOS ? 1 : 0,
-            rel: 0,
-            iv_load_policy: 3,
-            autoplay: 0,
-            hl: 'en',
-            origin: window.location.origin
+          // Remove existing player if present (handles re-initialization)
+          if (youtubePlayerRef.current?.firstChild) {
+            youtubePlayerRef.current.firstChild.remove();
           }
+
+          youtubePlayerRef.current?.appendChild(div);
+
+          // Initialize YouTube Player with configuration
+          playerRef.current = new window.YT.Player(div, {
+            videoId: id,
+            // Use regular YouTube domain for shorts, nocookie domain for regular videos
+            host:
+              service === 'youtube-shorts'
+                ? 'https://www.youtube.com'
+                : 'https://www.youtube-nocookie.com',
+            playerVars: {
+              playsinline: isIOS ? 0 : 1,
+              cc_load_policy: 0,
+              cc_lang_pref: 'en',
+              controls: defaultControls ? 1 : 0,
+              disablekb: defaultControls ? 0 : 1,
+              fs: defaultControls || isIOS ? 1 : 0,
+              rel: 0,
+              iv_load_policy: 3,
+              autoplay: 0,
+              hl: 'en',
+              origin: window.location.origin
+            }
+          });
+
+          // Get iframe window reference for message event filtering
+          iframeWindow = playerRef.current?.getIframe()?.contentWindow;
+
+          // Attach event listeners to YouTube player
+          playerRef.current.addEventListener('onStateChange', onStateChange);
+          playerRef.current.addEventListener('onError', onError);
+          playerRef.current.addEventListener('onReady', onReady);
+          // Listen for postMessage events from YouTube iframe
+          window.addEventListener('message', onMessage);
         });
-
-        // Get iframe window reference for message event filtering
-        iframeWindow = playerRef.current?.getIframe()?.contentWindow;
-
-        // Attach event listeners to YouTube player
-        playerRef.current.addEventListener('onStateChange', onStateChange);
-        playerRef.current.addEventListener('onError', onError);
-        playerRef.current.addEventListener('onReady', onReady);
-        // Listen for postMessage events from YouTube iframe
-        window.addEventListener('message', onMessage);
       })
       .catch((error) => {
         console.error(error);
