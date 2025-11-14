@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { forwardRef, useContext, useEffect, useImperativeHandle, useRef } from 'react';
 import { ContextProvider } from './player';
-import { waitForLibrary } from './helper/wait';
+import { loadLibrary } from './helper/load';
 
 /**
  * Video component that wraps an HTML5 video element with support for multiple video formats
@@ -53,7 +53,7 @@ const Video = forwardRef(({ src }: { src: string }, ref: any) => {
         loadVideo(url);
       } else {
         // Use HLS.js library for browsers without native HLS support
-        waitForLibrary('Hls')
+        loadLibrary('Hls')
           .then(() => {
             if (window.Hls.isSupported()) {
               const hls = new window.Hls();
@@ -67,7 +67,7 @@ const Video = forwardRef(({ src }: { src: string }, ref: any) => {
       }
     } else if (src.endsWith('.mpd')) {
       // DASH (Dynamic Adaptive Streaming over HTTP) format
-      waitForLibrary('dashjs')
+      loadLibrary('dashjs')
         .then(() => {
           const player = window.dashjs.MediaPlayer().create();
           player.initialize(videoRef.current, src, false);

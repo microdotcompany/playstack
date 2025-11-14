@@ -1,4 +1,4 @@
-import { Player, Provider } from 'playstack';
+import { Player } from 'playstack';
 import { useRef, useState } from 'react';
 
 // Preview component for testing and demonstrating the player functionality
@@ -11,9 +11,8 @@ const App = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
-      <Provider>
-        <Player ref={playerRef} src={src} onTitleChange={(title) => console.log('title', title)} />
-      </Provider>
+      <Player ref={playerRef} src={src} onTitleChange={(title) => console.log('title', title)} />
+
       <div
         style={{
           display: 'flex',

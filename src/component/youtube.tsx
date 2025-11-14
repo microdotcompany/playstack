@@ -1,6 +1,6 @@
 import { forwardRef, useContext, useEffect, useImperativeHandle, useRef } from 'react';
 import { ContextProvider } from './player';
-import { waitForLibrary } from './helper/wait';
+import { loadLibrary } from './helper/load';
 
 // Component props interface for YouTube player
 interface YoutubeProps {
@@ -104,7 +104,7 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
     };
 
     // Wait for YouTube IFrame API to load, then initialize player
-    waitForLibrary('YT')
+    loadLibrary('YT')
       .then(() => {
         const div = document.createElement('div');
 

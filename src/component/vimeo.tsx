@@ -1,6 +1,6 @@
 import { forwardRef, useContext, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
 import { ContextProvider } from './player';
-import { waitForLibrary } from './helper/wait';
+import { loadLibrary } from './helper/load';
 
 /**
  * Props for the Vimeo player component
@@ -155,7 +155,7 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
     };
 
     // Wait for Vimeo Player library to load, then initialize the player
-    waitForLibrary('Vimeo')
+    loadLibrary('Vimeo')
       .then(() => {
         // Create new Vimeo Player instance
         playerRef.current = new window.Vimeo.Player(vimeoPlayerRef.current, {

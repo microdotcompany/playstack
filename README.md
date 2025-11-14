@@ -32,21 +32,17 @@ import 'playstack/dist/style.css';
 
 ## Quick Start
 
-**Important**: The `Provider` component is required to load all necessary video player libraries. Wrap your app or player components with it.
-
 ### YouTube
 
 ```tsx
-import { Player, Provider } from 'playstack';
+import { Player } from 'playstack';
 
 function App() {
   return (
-    <Provider>
-      <Player
-        src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-        onTimeUpdate={(time) => console.log('Current time:', time.current)}
-      />
-    </Provider>
+    <Player
+      src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      onTimeUpdate={(time) => console.log('Current time:', time.current)}
+    />
   );
 }
 ```
@@ -54,16 +50,14 @@ function App() {
 ### Vimeo
 
 ```tsx
-import { Player, Provider } from 'playstack';
+import { Player } from 'playstack';
 
 function App() {
   return (
-    <Provider>
-      <Player
-        src="https://vimeo.com/123456789"
-        onTimeUpdate={(time) => console.log('Current time:', time.current)}
-      />
-    </Provider>
+    <Player
+      src="https://vimeo.com/123456789"
+      onTimeUpdate={(time) => console.log('Current time:', time.current)}
+    />
   );
 }
 ```
@@ -73,22 +67,20 @@ function App() {
 **Important**: Bunny Stream requires both `src` (iframe URL) and `config.bunny` props to work properly. If `src` is not provided, the player will show a loading indicator indefinitely.
 
 ```tsx
-import { Player, Provider } from 'playstack';
+import { Player } from 'playstack';
 
 function App() {
   return (
-    <Provider>
-      <Player
-        src="https://iframe.mediadelivery.net/embed/your-library/your-video-id"
-        config={{
-          bunny: {
-            id: 'your-video-id',
-            hostname: 'your-library.b-cdn.net'
-          }
-        }}
-        onTimeUpdate={(time) => console.log('Current time:', time.current)}
-      />
-    </Provider>
+    <Player
+      src="https://iframe.mediadelivery.net/embed/your-library/your-video-id"
+      config={{
+        bunny: {
+          id: 'your-video-id',
+          hostname: 'your-library.b-cdn.net'
+        }
+      }}
+      onTimeUpdate={(time) => console.log('Current time:', time.current)}
+    />
   );
 }
 ```
@@ -111,14 +103,6 @@ function App() {
 | `onReady`                   | `(player: any) => void`                                 | -           | Callback when player is ready (receives player instance)                                         |
 | `onVolumeChange`            | `(data: { volume: number; muted: boolean }) => void`    | -           | Callback when volume or mute state changes (does not work on Bunny Stream and Google Drive)      |
 | `onPlaybackRateChange`      | `(playbackRate: number) => void`                        | -           | Callback when playback rate changes (does not work on Bunny Stream and Google Drive)             |
-
-### Provider
-
-Required wrapper component that loads all necessary video player libraries (YouTube API, Vimeo API, Bunny Player.js, HLS.js, Dash.js).
-
-```tsx
-<Provider>{/* Your app components */}</Provider>
-```
 
 ### Player Ref
 

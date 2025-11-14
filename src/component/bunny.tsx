@@ -1,6 +1,6 @@
 import { forwardRef, useContext, useEffect, useImperativeHandle, useRef } from 'react';
 import { ContextProvider } from './player';
-import { waitForLibrary } from './helper/wait';
+import { loadLibrary } from './helper/load';
 
 /**
  * Props for the Bunny video player component
@@ -34,7 +34,7 @@ export const Bunny = forwardRef(({ src, thumbnail, id }: props, ref) => {
   useEffect(() => {
     if (src) {
       // Wait for the Player.js library to load before initializing
-      waitForLibrary('playerjs')
+      loadLibrary('playerjs')
         .then(() => {
           // Create new player instance with the iframe element
           playerRef.current = new window.playerjs.Player(iframe.current);
