@@ -72,6 +72,11 @@ export const Bunny = forwardRef(({ src, thumbnail, id }: props, ref) => {
   useImperativeHandle(
     ref,
     () => ({
+      /**
+       * Returns the underlying Bunny.net Player instance.
+       *
+       * @returns The Bunny.net Player instance or null if not available
+       */
       instance: () => playerRef.current
     }),
     [playerRef]

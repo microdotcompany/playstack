@@ -195,28 +195,61 @@ const Video = forwardRef(({ src }: { src: string }, ref: any) => {
   useImperativeHandle(
     ref,
     () => ({
+      /**
+       * Starts video playback
+       */
       play: () => {
         videoRef.current?.play();
       },
+      /**
+       * Pauses video playback
+       */
       pause: () => {
         videoRef.current?.pause();
       },
+      /**
+       * Seeks to a specific time in the video.
+       * Updates the context immediately to ensure the seekbar reflects the new position
+       * for better user experience before the video element's timeupdate event fires.
+       *
+       * @param time - The target time in seconds
+       */
       seekTo: (time: number) => {
         if (videoRef.current) {
-          // set the current time in the context to the new time - it will make sure the seekbar is updated immediately (improve user experience)
+          // Update context immediately to ensure seekbar updates without delay
           setCurrentTime(time);
           videoRef.current.currentTime = time;
         }
       },
+      /**
+       * Sets the video volume.
+       *
+       * @param volume - Volume level between 0 and 1
+       */
       setVolume: (volume: number) => {
         if (videoRef.current) videoRef.current.volume = volume;
       },
+      /**
+       * Sets the muted state of the video.
+       *
+       * @param muted - Whether the video should be muted
+       */
       setMuted: (muted: boolean) => {
         if (videoRef.current) videoRef.current.muted = muted;
       },
+      /**
+       * Sets the playback rate of the video.
+       *
+       * @param playbackRate - Playback speed (1.0 = normal, 2.0 = 2x speed, etc.)
+       */
       setPlaybackRate: (playbackRate: number) => {
         if (videoRef.current) videoRef.current.playbackRate = playbackRate;
       },
+      /**
+       * Returns the underlying HTML5 video element instance.
+       *
+       * @returns The video element or null if not available
+       */
       instance: () => videoRef.current
     }),
     [videoRef]

@@ -166,12 +166,23 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
   useImperativeHandle(
     ref,
     () => ({
+      /**
+       * Starts video playback
+       */
       play: () => {
         playerRef.current?.play();
       },
+      /**
+       * Pauses video playback
+       */
       pause: () => {
         playerRef.current?.pause();
       },
+      /**
+       * Sets the video volume.
+       *
+       * @param volume - Volume level between 0 and 1
+       */
       setVolume: (volume: number) => {
         playerRef.current?.setVolume(volume);
       },
@@ -188,19 +199,43 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
             .catch(() => resolve(null));
         });
       },
+      /**
+       * Seeks to a specific time in the video.
+       * Manually sets buffering state since bufferstart event may not trigger during manual seeking.
+       * Updates the context immediately to ensure the seekbar reflects the new position
+       * for better user experience before the seeked event fires.
+       *
+       * @param time - The target time in seconds
+       */
       seekTo: (time: number) => {
-        // when manual seeking the bufferstart wont trigger so we need to set the state to buffering manually when seek completed the event will trigger and set the state to playing
+        // When manual seeking, bufferstart won't trigger, so we need to set the state to buffering manually.
+        // When seek completes, the seeked event will trigger and set the state to playing.
         setState('buffering');
-        // set the current time in the context to the new time - it will make sure the seekbar is updated immediately (improve user experience)
+        // Set the current time in the context to the new time - ensures the seekbar is updated immediately (improves user experience)
         setCurrentTime(time);
         playerRef.current?.setCurrentTime(time);
       },
+      /**
+       * Sets the muted state of the video.
+       *
+       * @param muted - Whether the video should be muted
+       */
       setMuted: (muted: boolean) => {
         playerRef.current?.setMuted(muted);
       },
+      /**
+       * Sets the playback rate of the video.
+       *
+       * @param playbackRate - Playback speed (1.0 = normal, 2.0 = 2x speed, etc.)
+       */
       setPlaybackRate: (playbackRate: number) => {
         playerRef.current?.setPlaybackRate(playbackRate);
       },
+      /**
+       * Returns the underlying Vimeo Player instance.
+       *
+       * @returns The Vimeo Player instance or null if not available
+       */
       instance: () => playerRef.current
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps

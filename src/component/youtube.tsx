@@ -156,12 +156,22 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
   useImperativeHandle(
     ref,
     () => ({
+      /**
+       * Start video playback
+       */
       play: () => {
         playerRef.current?.playVideo();
       },
+      /**
+       * Pause video playback
+       */
       pause: () => {
         playerRef.current?.pauseVideo();
       },
+      /**
+       * Set the player volume
+       * @param volume - Volume level between 0 and 1 (converted to YouTube's 0-100 range)
+       */
       setVolume: (volume: number) => {
         // Convert 0-1 range to YouTube's 0-100 range
         playerRef.current?.setVolume(volume * 100);
@@ -175,12 +185,21 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
           resolve(playerRef.current?.videoTitle);
         });
       },
+      /**
+       * Seek to a specific time in the video
+       * @param time - Time in seconds to seek to
+       * Updates the context immediately for responsive UI feedback, then seeks the player
+       */
       seekTo: (time: number) => {
-        // set the current time in the context to the new time - it will make sure the seekbar is updated immediately (improve user experience)
+        // Update context immediately to ensure seekbar updates without delay
         setCurrentTime(time);
         // Seek to time (second parameter true = allow seeking before video is loaded)
         playerRef.current?.seekTo(time, true);
       },
+      /**
+       * Set the muted state of the player
+       * @param muted - Whether the player should be muted
+       */
       setMuted: (muted: boolean) => {
         if (muted) {
           playerRef.current?.mute();
@@ -188,9 +207,17 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
           playerRef.current?.unMute();
         }
       },
+      /**
+       * Set the playback rate/speed
+       * @param playbackRate - Playback rate (e.g., 1.0 = normal, 1.5 = 1.5x speed, 0.5 = 0.5x speed)
+       */
       setPlaybackRate: (playbackRate: number) => {
         playerRef.current?.setPlaybackRate(playbackRate);
       },
+      /**
+       * Get the raw YouTube Player API instance
+       * @returns The YouTube Player API instance for direct access
+       */
       instance: () => playerRef.current
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
