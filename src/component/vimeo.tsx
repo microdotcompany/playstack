@@ -128,6 +128,32 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
       setState((state: string) => (state === 'buffering' ? 'playing' : state));
     };
 
+    /**
+     * Event handler: Called when the video enters or exits fullscreen mode
+     * Prevents accidental fullscreen entry from double-tap gesture on non-iOS devices
+     * when using custom controls (not defaultControls)
+     */
+    const onFullscreenChange = (data: any) => {
+      // When video enters fullscreen via double-tap gesture on non-iOS devices with custom controls,
+      // automatically exit fullscreen if the video hasn't started playing yet (time is at 0)
+      // This prevents unwanted fullscreen mode when users accidentally double-tap
+      if (data.fullscreen && !defaultControls && !isIOS) {
+        // Check current playback time to see if video has started
+        playerRef.current
+          .getCurrentTime()
+          .then((time: number) => {
+            // If video is still at the beginning (time <= 0), exit fullscreen immediately
+            // This handles the case where user double-tapped before playback started
+            if (time <= 0) {
+              playerRef.current
+                .exitFullscreen()
+                .catch((err: any) => console.log('exitFullscreen error', err));
+            }
+          })
+          .catch((err: any) => console.log('onFullscreenChange getCurrenTime error', err));
+      }
+    };
+
     // Wait for Vimeo Player library to load, then initialize the player
     waitForLibrary('Vimeo')
       .then(() => {
@@ -137,9 +163,14 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
           autoplay: false,
           controls: true,
           muted: false,
-          playsinline: isIOS ? false : true,
+          playsinline: true,
           fullscreen: defaultControls || isIOS ? true : false,
-          keyboard: defaultControls ? true : false
+          keyboard: defaultControls ? true : false,
+          title: false,
+          transparent: false,
+          portrait: false,
+          byline: false,
+          badge: false
         });
 
         // Wait for player to be ready before attaching event listeners
@@ -158,6 +189,7 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
             playerRef.current.on('error', onError);
             playerRef.current.on('volumechange', onVolumeChange);
             playerRef.current.on('playbackratechange', onPlaybackRateChange);
+            playerRef.current.on('fullscreenchange', onFullscreenChange);
           })
           .catch((error: any) => {
             console.error('Error initializing Vimeo player:', error);

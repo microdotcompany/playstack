@@ -335,38 +335,39 @@ export const Controls = ({
             </DropdownMenu.Portal>
           </DropdownMenu.Root>
 
-          {(!isIOS || (service as any) === 'other') && (
-            <button
-              onClick={() => {
-                // Handle fullscreen toggle differently for iOS vs other platforms
-                if (isIOS) {
-                  // iOS requires native video element fullscreen API
-                  const videoEl = player.current.instance();
+          <button
+            onClick={() => {
+              // iOS: Use native video element fullscreen API (required for iOS Safari)
+              // Non-iOS: Use screenfull library to toggle fullscreen on the container element
+              if (isIOS) {
+                // iOS requires native video element fullscreen API
+                const videoEl = player.current.instance();
+                if (!videoEl) return;
 
-                  if (!videoEl) return;
+                // Vimeo: Vimeo player has its own fullscreen API
+                if (service === 'vimeo') return videoEl.requestFullscreen();
 
-                  // Try standard requestFullscreen first, fallback to webkitEnterFullscreen for iOS Safari
-                  const enter =
-                    videoEl.requestFullscreen?.bind(videoEl) ??
-                    (videoEl as any).webkitEnterFullscreen?.bind(videoEl);
-                  if (enter) {
-                    enter();
-                  } else {
-                    console.warn('Fullscreen API is not available on this device.');
-                  }
+                // Try standard requestFullscreen first, fallback to webkitEnterFullscreen for iOS Safari
+                const enter =
+                  videoEl.requestFullscreen?.bind(videoEl) ??
+                  (videoEl as any).webkitEnterFullscreen?.bind(videoEl);
+                if (enter) {
+                  enter();
                 } else {
-                  // For non-iOS devices, use screenfull library to toggle fullscreen on the container
-                  if (screenfull.isFullscreen) {
-                    screenfull.exit();
-                  } else {
-                    screenfull.request(container.current as any);
-                  }
+                  console.warn('Fullscreen API is not available on this device.');
                 }
-              }}
-            >
-              {fullscreen ? <IconArrowsMinimize /> : <IconArrowsMaximize />}
-            </button>
-          )}
+              } else {
+                // For non-iOS devices, use screenfull library to toggle fullscreen on the container
+                if (screenfull.isFullscreen) {
+                  screenfull.exit();
+                } else {
+                  screenfull.request(container.current as any);
+                }
+              }
+            }}
+          >
+            {fullscreen ? <IconArrowsMinimize /> : <IconArrowsMaximize />}
+          </button>
         </div>
       )}
     </div>
