@@ -34,7 +34,7 @@ export const Controls = ({
   const [activeControls, setActiveControls] = useState<boolean>(false);
 
   // Get player state and properties from context
-  const { started, state, currentTime, duration, isIOS, volume, muted, playbackRate } =
+  const { started, state, currentTime, duration, isIOS, volume, muted, playbackRate, error } =
     useContext(ContextProvider);
 
   // State to track fullscreen mode
@@ -169,7 +169,7 @@ export const Controls = ({
     return () => document.body.removeEventListener('keydown', onKeydown);
   }, [togglePlay, currentTime, duration, volume, muted, player]);
 
-  return (
+  return error ? null : (
     <div
       className={`controls ${fullscreen ? 'fullscreen' : ''}`}
       style={{

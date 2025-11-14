@@ -22,6 +22,9 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
   // Reference to the DOM element where the Vimeo player will be embedded
   const vimeoPlayerRef = useRef<HTMLDivElement>(null);
 
+  // Reference to store the previous buffering state
+  const wasBuffering = useRef<boolean>(false);
+
   // Access player context methods and state
   const {
     setStarted,
@@ -96,7 +99,7 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
      */
     const onError = (error: any) => {
       console.error('Error player:', error);
-      setError(error);
+      if (error.name !== 'PlayInterrupted') setError(error);
     };
 
     /**
@@ -112,6 +115,17 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
      */
     const onPlaybackRateChange = (data: any) => {
       setPlaybackRate(data.playbackRate);
+    };
+
+    /*
+     * Event handler: Called when the video is seeked
+     * Sets the state to playing if the video was previously buffering
+     */
+    const onSeeked = () => {
+      // reset the buffering state
+      wasBuffering.current = false;
+      // set the state to playing if the video was previously buffering
+      setState((state: string) => (state === 'buffering' ? 'playing' : state));
     };
 
     // Wait for Vimeo Player library to load, then initialize the player
@@ -138,7 +152,7 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
             playerRef.current.on('pause', onPause);
             playerRef.current.on('ended', onEnded);
             playerRef.current.on('bufferstart', onBuffering);
-            playerRef.current.on('seeked', onPlay);
+            playerRef.current.on('seeked', onSeeked);
             playerRef.current.on('bufferend', onPlay);
             playerRef.current.on('timeupdate', onTimeUpdate);
             playerRef.current.on('error', onError);
@@ -170,12 +184,17 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
        * Starts video playback
        */
       play: () => {
+        // if the video was previously buffering, set the state to buffering
+        // this will show the buffering indicator to the user
+        if (wasBuffering.current) setState('buffering');
         playerRef.current?.play();
       },
       /**
        * Pauses video playback
        */
       pause: () => {
+        // if the video was previously buffering, set the state to paused (because the video was paused before seeking)
+        if (wasBuffering.current) setState('paused');
         playerRef.current?.pause();
       },
       /**
@@ -208,9 +227,11 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
        * @param time - The target time in seconds
        */
       seekTo: (time: number) => {
+        // set the buffering state to true
+        wasBuffering.current = true;
         // When manual seeking, bufferstart won't trigger, so we need to set the state to buffering manually.
         // When seek completes, the seeked event will trigger and set the state to playing.
-        setState('buffering');
+        setState((state: string) => (state === 'playing' ? 'buffering' : state));
         // Set the current time in the context to the new time - ensures the seekbar is updated immediately (improves user experience)
         setCurrentTime(time);
         playerRef.current?.setCurrentTime(time);

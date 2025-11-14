@@ -14,6 +14,9 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
   // Ref to the DOM element that will contain the YouTube player
   const youtubePlayerRef = useRef<HTMLDivElement>(null);
 
+  // Reference to store the previous buffering state
+  const wasBuffering = useRef<boolean>(false);
+
   // Access player context methods and state
   const {
     isIOS,
@@ -41,10 +44,17 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
     // Handler for YouTube player state changes
     // Maps YouTube player states (1=playing, 3=buffering, 0=ended, etc.) to our internal state
     const onStateChange = (event: any) => {
+      // reset the buffering state
+      wasBuffering.current = false;
       if (event.data === 1) {
+        // set the state to playing
         setState('playing');
+        // set the started state to true
         setStarted(true);
       } else if (event.data === 3) {
+        // set the buffering state to true
+        wasBuffering.current = true;
+        // set the state to buffering
         setState('buffering');
       } else {
         setState('paused');
@@ -160,12 +170,16 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
        * Start video playback
        */
       play: () => {
+        // if the video was previously buffering, set the state to buffering
+        if (wasBuffering.current) setState('buffering');
         playerRef.current?.playVideo();
       },
       /**
        * Pause video playback
        */
       pause: () => {
+        // if the video was previously buffering, set the state to paused (because the video was paused before seeking)
+        if (wasBuffering.current) setState('paused');
         playerRef.current?.pauseVideo();
       },
       /**
