@@ -27,7 +27,8 @@ const Video = forwardRef(({ src }: { src: string }, ref: any) => {
     setReady,
     setVolume,
     setMuted,
-    setPlaybackRate
+    setPlaybackRate,
+    setLive
   } = useContext(ContextProvider);
 
   useEffect(() => {
@@ -92,6 +93,8 @@ const Video = forwardRef(({ src }: { src: string }, ref: any) => {
     const onCanPlay = () => {
       setReady(true);
       setDuration(videoRef.current?.duration);
+      // if the video is live, set the live state to true
+      if (videoRef.current?.duration === Infinity) setLive(true);
       // this will prevent the video from playing automatically (if the video is not autoplayed)
       if (!videoRef.current?.autoplay && !videoRef.current?.paused) videoRef.current?.pause();
     };
@@ -101,6 +104,16 @@ const Video = forwardRef(({ src }: { src: string }, ref: any) => {
      * Updates the current playback time in context
      */
     const onTimeUpdate = () => {
+      // if the video is live, set the live state to true
+      if (hlsRef.current) {
+        setLive((state: boolean) =>
+          state ? state : hlsRef.current.levelController?.currentLevel?.details?.live
+        );
+      } else if (typeof dashRef.current?.getManifest === 'function') {
+        setLive((state: boolean) =>
+          state ? state : dashRef.current.getManifest()?.type === 'dynamic' ? true : false
+        );
+      }
       setCurrentTime(videoRef.current?.currentTime);
     };
 
@@ -180,8 +193,14 @@ const Video = forwardRef(({ src }: { src: string }, ref: any) => {
 
     // Cleanup: remove all event listeners when component unmounts or src changes
     return () => {
-      if (hlsRef.current) hlsRef.current.destroy();
-      if (dashRef.current) dashRef.current.destroy();
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+      if (dashRef.current) {
+        dashRef.current.destroy();
+        dashRef.current = null;
+      }
 
       if (!videoRef.current) return;
 

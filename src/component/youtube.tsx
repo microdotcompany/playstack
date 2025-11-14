@@ -28,7 +28,8 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
     setVolume,
     setMuted,
     setPlaybackRate,
-    setError
+    setError,
+    setLive
   } = useContext(ContextProvider);
 
   useEffect(() => {
@@ -98,6 +99,11 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
 
           if (typeof data.info.playbackRate === 'number') {
             setPlaybackRate(data.info.playbackRate);
+          }
+
+          // if the video is live, set the live state to true
+          if (data.info.videoData?.isLive) {
+            setLive(true);
           }
         }
       }

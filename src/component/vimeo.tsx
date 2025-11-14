@@ -36,7 +36,8 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
     setVolume,
     setMuted,
     setPlaybackRate,
-    setError
+    setError,
+    setLive
   } = useContext(ContextProvider);
 
   // Construct the Vimeo player URL with hash parameter for unlisted videos
@@ -48,11 +49,13 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
   useEffect(() => {
     /**
      * Event handler: Called when the player is ready
-     * Fetches and sets the video duration
+     * Fetches and sets the video duration and live state
      */
     const onReady = () => {
       setReady(true);
       playerRef.current.getDuration().then(function (duration: number) {
+        // if the video is live, set the live state to true
+        setLive(duration === 0 ? true : false);
         setDuration(duration);
       });
     };

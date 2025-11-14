@@ -34,7 +34,7 @@ export const Controls = ({
   const [activeControls, setActiveControls] = useState<boolean>(false);
 
   // Get player state and properties from context
-  const { started, state, currentTime, duration, isIOS, volume, muted, playbackRate, error } =
+  const { started, state, currentTime, duration, isIOS, volume, muted, playbackRate, live, error } =
     useContext(ContextProvider);
 
   // State to track fullscreen mode
@@ -52,6 +52,8 @@ export const Controls = ({
   // Calculate remaining time in a human-readable format (days:hours:minutes:seconds)
   // Handles videos longer than 24 hours by including days and hours when needed
   const remainingTime = useMemo(() => {
+    if (live) return 0;
+
     let remaining = Math.max(0, Math.floor(duration - currentTime));
     const days = Math.floor(remaining / 86400);
     remaining %= 86400;
@@ -67,7 +69,7 @@ export const Controls = ({
     parts.push(seconds.toString().padStart(2, '0'));
 
     return parts.join(':');
-  }, [currentTime, duration]);
+  }, [currentTime, duration, live]);
 
   // Toggle play/pause state of the player
   const togglePlay = useCallback(() => {
@@ -189,11 +191,11 @@ export const Controls = ({
       >
         <Slider.Root
           className="SliderRoot"
-          value={[currentTime]}
-          max={duration}
+          value={[live ? 1 : currentTime]}
+          max={live ? 1 : duration}
           step={1}
           onValueChange={(v) => {
-            player.current.seekTo(v[0]);
+            if (!live) player.current.seekTo(v[0]);
           }}
         >
           <Slider.Track
@@ -211,7 +213,24 @@ export const Controls = ({
           </Slider.Track>
           <Slider.Thumb className="SliderThumb" aria-label="Volume" />
         </Slider.Root>
-        <span className="time">-{remainingTime}</span>
+        <span className="time">
+          {live ? (
+            <span
+              style={{
+                backgroundColor: 'red',
+                color: 'white',
+                padding: '0.25rem 0.5rem',
+                borderRadius: '0.25rem',
+                fontWeight: 'medium',
+                marginLeft: '.25rem'
+              }}
+            >
+              LIVE
+            </span>
+          ) : (
+            `-${remainingTime}`
+          )}
+        </span>
       </div>
 
       {!onlyShowSeekbar && (

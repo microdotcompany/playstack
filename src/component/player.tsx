@@ -109,6 +109,7 @@ export const Player = forwardRef(
     const [muted, setMuted] = useState<boolean>(false);
     const [playbackRate, setPlaybackRate] = useState<number>(1);
     const [error, setError] = useState<any>(null);
+    const [live, setLive] = useState<boolean>(false);
 
     /**
      * Video Service Detection and Parsing
@@ -212,6 +213,7 @@ export const Player = forwardRef(
       setMuted(defaultOptions.muted);
       setPlaybackRate(1);
       setError(null);
+      setLive(false);
     }, [video]);
 
     /**
@@ -311,7 +313,9 @@ export const Player = forwardRef(
           playbackRate,
           setPlaybackRate,
           error,
-          setError
+          setError,
+          live,
+          setLive
         }}
       >
         <div
