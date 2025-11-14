@@ -138,7 +138,7 @@ The Player component supports ref forwarding. You can use a callback function th
 - **URL Formats**: Standard Vimeo URLs, Vimeo player URLs
 - **Usage**: Simply pass the Vimeo URL to the `src` prop
 - **Theme Support**: ✅ Full theme customization
-- **iOS Fullscreen**: ✅ Native fullscreen support on iOS (video automatically enters fullscreen when playback starts)
+- **iOS Fullscreen**: ✅ Native fullscreen support on iOS
 - **Example**:
   ```tsx
   <Player src="https://vimeo.com/123456789" />
@@ -180,7 +180,7 @@ The Player component supports ref forwarding. You can use a callback function th
 - **Features**: Native support for Mux video streams (HLS)
 - **URL Formats**: Mux stream URLs (automatically converts to `.m3u8` if needed)
 - **Theme Support**: ✅ Full theme customization
-- **iOS Fullscreen**: ✅ Native fullscreen support on iOS (video enters fullscreen when playback starts)
+- **iOS Fullscreen**: ✅ Native fullscreen support on iOS
 - **Example**:
   ```tsx
   <Player src="https://stream.mux.com/your-video-id" />
@@ -191,7 +191,7 @@ The Player component supports ref forwarding. You can use a callback function th
 
 - **Features**: Native HTML5 video support, including HLS and DASH streams
 - **Theme Support**: ✅ Full theme customization
-- **iOS Fullscreen**: ✅ Native fullscreen support on iOS (video enters fullscreen when playback starts)
+- **iOS Fullscreen**: ✅ Native fullscreen support on iOS
 - **Example**:
   ```tsx
   <Player src="https://example.com/video.mp4" />
@@ -316,7 +316,8 @@ You can hide all custom controls:
 
 - **iOS Safari**:
 
-  - YouTube, Vimeo, direct video, HLS, DASH, Mux: Native fullscreen support (video automatically enters fullscreen on play)
+  - YouTube: Native fullscreen support (video automatically enters fullscreen when playback starts)
+  - Vimeo, direct video, HLS, DASH, Mux: Native fullscreen support on iOS
   - Bunny Stream and Google Drive: Full native iOS fullscreen support
   - **Note**: The volume bar will not be displayed on iOS devices for custom controls, as programmatic volume control is not supported by iOS browsers.
 
