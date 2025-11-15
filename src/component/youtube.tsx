@@ -7,8 +7,9 @@ interface YoutubeProps {
   id: string;
   service: string;
   defaultControls?: boolean;
+  noCookie?: boolean;
 }
-const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref: any) => {
+const Youtube = forwardRef(({ id, service, defaultControls, noCookie }: YoutubeProps, ref: any) => {
   // Ref to store the YouTube Player API instance
   const playerRef = useRef<any>(null);
   // Ref to the DOM element that will contain the YouTube player
@@ -125,9 +126,9 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
           // Initialize YouTube Player with configuration
           playerRef.current = new window.YT.Player(div, {
             videoId: id,
-            // Use regular YouTube domain for shorts, nocookie domain for regular videos
+            // Use regular YouTube domain for shorts, nocookie domain for regular videos (if noCookie is true)
             host:
-              service === 'youtube-shorts'
+              service === 'youtube-shorts' || !noCookie
                 ? 'https://www.youtube.com'
                 : 'https://www.youtube-nocookie.com',
             playerVars: {
@@ -168,7 +169,7 @@ const Youtube = forwardRef(({ id, service, defaultControls }: YoutubeProps, ref:
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isIOS, id, service, defaultControls, youtubePlayerRef]);
+  }, [isIOS, id, service, defaultControls, noCookie, youtubePlayerRef]);
 
   // Expose player control methods via ref for parent components
   useImperativeHandle(

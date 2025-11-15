@@ -43,6 +43,9 @@ export interface PlayerProps {
       id: string; // Bunny.net video ID
       hostname: string; // Bunny.net CDN hostname
     };
+    youtube?: {
+      noCookie?: boolean;
+    };
     theme?: string; // CSS custom property for player theme color
     defaultControls?: boolean; // Use native browser/iframe controls instead of custom controls
     hidePlayerControls?: boolean; // Hide custom player controls entirely
@@ -334,6 +337,7 @@ export const Player = forwardRef(
               id={video.id}
               service={video.service}
               defaultControls={config?.defaultControls}
+              noCookie={config?.youtube?.noCookie}
             />
           ) : video?.service === 'vimeo' ? (
             <Vimeo
