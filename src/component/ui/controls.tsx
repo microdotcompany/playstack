@@ -136,12 +136,13 @@ export const Controls = ({
           }
           case 'ArrowRight': {
             e.preventDefault();
-            player.current.seekTo(currentTime + 10 >= duration ? duration : currentTime + 10);
+            if (!live)
+              player.current.seekTo(currentTime + 10 >= duration ? duration : currentTime + 10);
             break;
           }
           case 'ArrowLeft': {
             e.preventDefault();
-            player.current.seekTo(currentTime - 10 <= 0 ? 0 : currentTime - 10);
+            if (!live) player.current.seekTo(currentTime - 10 <= 0 ? 0 : currentTime - 10);
             break;
           }
           case 'ArrowUp': {
@@ -169,7 +170,7 @@ export const Controls = ({
     document.body.addEventListener('keydown', onKeydown);
     // Cleanup: remove event listener on unmount or dependency change
     return () => document.body.removeEventListener('keydown', onKeydown);
-  }, [togglePlay, currentTime, duration, volume, muted, player]);
+  }, [togglePlay, currentTime, duration, volume, muted, player, live]);
 
   return error ? null : (
     <div
