@@ -72,8 +72,20 @@ const Youtube = forwardRef(
 
       // Error handler for YouTube player errors
       const onError = (error: any) => {
-        console.error('Error player:', error);
-        setError(error);
+        // if the video is playable (some times prvt video through error 5) and the duration is greater than 1 second, do not set the error
+        if (error.data === 5 && playerRef.current?.getDuration() >= 1) {
+          const videoData = playerRef.current.getVideoData?.();
+
+          // private video mostly doesnt have isPlayable property
+          if (typeof videoData?.isPlayable === 'boolean' && !videoData?.isPlayable) {
+            setError(error);
+          } else {
+            console.log('Playable video');
+          }
+        } else {
+          console.error('Error player:', error);
+          setError(error);
+        }
       };
 
       // Message handler for cross-origin communication with YouTube iframe
