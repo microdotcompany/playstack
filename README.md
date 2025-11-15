@@ -89,20 +89,22 @@ function App() {
 
 ### Player Props
 
-| Prop                        | Type                                                    | Default     | Description                                                                                      |
-| --------------------------- | ------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------ |
-| `src`                       | `string`                                                | -           | Direct video URL (YouTube, Vimeo, Mux, HLS, DASH, direct video, etc.) or Bunny Stream iframe URL |
-| `config`                    | `object`                                                | -           | Configuration object (see below)                                                                 |
-| `config.bunny`              | `{ id: string; hostname: string }`                      | -           | Bunny Stream configuration (requires `src` to be provided)                                       |
-| `config.theme`              | `string`                                                | `'#00B2FF'` | Theme color for player controls (YouTube, Vimeo, and direct video platforms only)                |
-| `config.defaultControls`    | `boolean`                                               | `false`     | Use default platform controls instead of custom controls                                         |
-| `config.hidePlayerControls` | `boolean`                                               | `false`     | Hide all player controls (overlay and controls bar)                                              |
-| `onTimeUpdate`              | `(time: { current: number; duration: number }) => void` | -           | Callback for time updates                                                                        |
-| `onDurationChange`          | `(duration: number) => void`                            | -           | Callback when video duration is available                                                        |
-| `onTitleChange`             | `(title?: string) => void`                              | -           | Callback when video title is available (YouTube and Vimeo only)                                  |
-| `onReady`                   | `(player: any) => void`                                 | -           | Callback when player is ready (receives player instance)                                         |
-| `onVolumeChange`            | `(data: { volume: number; muted: boolean }) => void`    | -           | Callback when volume or mute state changes (does not work on Bunny Stream and Google Drive)      |
-| `onPlaybackRateChange`      | `(playbackRate: number) => void`                        | -           | Callback when playback rate changes (does not work on Bunny Stream and Google Drive)             |
+| Prop                        | Type                                                    | Default     | Description                                                                                                                                                            |
+| --------------------------- | ------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src`                       | `string`                                                | -           | Direct video URL (YouTube, Vimeo, Mux, HLS, DASH, direct video, etc.) or Bunny Stream iframe URL                                                                       |
+| `config`                    | `object`                                                | -           | Configuration object (see below)                                                                                                                                       |
+| `config.bunny`              | `{ id: string; hostname: string }`                      | -           | Bunny Stream configuration (requires `src` to be provided)                                                                                                             |
+| `config.youtube`            | `object`                                                | -           | YouTube-specific configuration (see below)                                                                                                                             |
+| `config.youtube.noCookie`   | `boolean`                                               | `true`      | Use YouTube's privacy-enhanced mode (youtube-nocookie.com). Set to `false` to use youtube.com. Note: YouTube Shorts always use youtube.com regardless of this setting. |
+| `config.theme`              | `string`                                                | `'#00B2FF'` | Theme color for player controls (YouTube, Vimeo, and direct video platforms only)                                                                                      |
+| `config.defaultControls`    | `boolean`                                               | `false`     | Use default platform controls instead of custom controls                                                                                                               |
+| `config.hidePlayerControls` | `boolean`                                               | `false`     | Hide all player controls (overlay and controls bar)                                                                                                                    |
+| `onTimeUpdate`              | `(time: { current: number; duration: number }) => void` | -           | Callback for time updates                                                                                                                                              |
+| `onDurationChange`          | `(duration: number) => void`                            | -           | Callback when video duration is available                                                                                                                              |
+| `onTitleChange`             | `(title?: string) => void`                              | -           | Callback when video title is available (YouTube and Vimeo only)                                                                                                        |
+| `onReady`                   | `(player: any) => void`                                 | -           | Callback when player is ready (receives player instance)                                                                                                               |
+| `onVolumeChange`            | `(data: { volume: number; muted: boolean }) => void`    | -           | Callback when volume or mute state changes (does not work on Bunny Stream and Google Drive)                                                                            |
+| `onPlaybackRateChange`      | `(playbackRate: number) => void`                        | -           | Callback when playback rate changes (does not work on Bunny Stream and Google Drive)                                                                                   |
 
 ### Player Ref
 
@@ -125,11 +127,19 @@ The Player component supports ref forwarding. You can use a callback function th
 - **Usage**: Simply pass the YouTube URL to the `src` prop
 - **Theme Support**: ✅ Full theme customization
 - **iOS Fullscreen**: ✅ Native fullscreen support on iOS (video automatically enters fullscreen when playback starts)
+- **Privacy Mode**: By default, uses YouTube's privacy-enhanced mode (`youtube-nocookie.com`). You can disable this by setting `config.youtube.noCookie` to `false`. Note: YouTube Shorts always use `youtube.com` regardless of this setting.
 - **Example**:
+
   ```tsx
   <Player src="https://www.youtube.com/watch?v=dQw4w9WgXcQ" />
   <Player src="https://youtu.be/dQw4w9WgXcQ" />
   <Player src="https://www.youtube.com/shorts/dQw4w9WgXcQ" />
+
+  // Use regular YouTube domain (not privacy-enhanced)
+  <Player
+    src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+    config={{ youtube: { noCookie: false } }}
+  />
   ```
 
 ### Vimeo
@@ -221,6 +231,19 @@ The Player component supports ref forwarding. You can use a callback function th
 ```tsx
 <Player src="https://www.youtube.com/watch?v=dQw4w9WgXcQ" config={{ theme: '#FF6B6B' }} />
 ```
+
+### YouTube Privacy Mode
+
+By default, the player uses YouTube's privacy-enhanced mode (`youtube-nocookie.com`) which doesn't store cookies. You can disable this to use the regular YouTube domain:
+
+```tsx
+<Player
+  src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+  config={{ youtube: { noCookie: false } }}
+/>
+```
+
+**Note**: YouTube Shorts always use `youtube.com` regardless of the `noCookie` setting.
 
 ### Default Controls
 
