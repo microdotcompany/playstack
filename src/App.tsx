@@ -36,20 +36,20 @@ const App = () => {
               { label: 'YouTube Shorts', url: 'https://www.youtube.com/shorts/tLZjL-dMH_g' },
               { label: 'Vimeo', url: 'https://vimeo.com/90509568' },
               {
-                label: 'Mux 1',
-                url: 'https://stream.mux.com/maVbJv2GSYNRgS02kPXOOGdJMWGU1mkA019ZUjYE7VU7k'
+                label: 'Live',
+                url: 'https://stream.mux.com/v69RSHhFelSm4701snP22dYz2jICy4E4FUyk02rW4gxRM.m3u8'
               },
               {
-                label: 'Mux 2',
+                label: 'Mux',
                 url: 'https://stream.mux.com/Sc89iWAyNkhJ3P1rQ02nrEdCFTnfT01CZ2KmaEcxXfB008'
-              },
-              {
-                label: 'DASH',
-                url: 'https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd'
               },
               {
                 label: 'HLS',
                 url: 'https://stream.mux.com/VcmKA6aqzIzlg3MayLJDnbF55kX00mds028Z65QxvBYaA.m3u8'
+              },
+              {
+                label: 'DASH',
+                url: 'https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd'
               },
               {
                 label: 'HTML',
