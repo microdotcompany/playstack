@@ -9,11 +9,11 @@ import { ContextProvider } from '../player';
 export const Overlay = ({
   thumbnail,
   player,
-  deferToIframeControls
+  service
 }: {
   thumbnail?: string;
   player: any;
-  deferToIframeControls?: boolean;
+  service?: string;
 }) => {
   // Get player state from context (started, state, ready, error)
   const { started, state, ready, error } = useContext(ContextProvider);
@@ -21,13 +21,20 @@ export const Overlay = ({
   // Determine if video is paused based on player state
   const paused = useMemo(() => state === 'paused', [state]);
 
+  // Determine if video is initial loading based on player state and ready state
+  const isInitialLoading = useMemo(
+    () => !ready || (!started && state === 'buffering'),
+    [started, state, ready]
+  );
+
   // Show thumbnail only if video hasn't started and a thumbnail URL is provided
   const showThumbnail = useMemo(() => !started && thumbnail, [started, thumbnail]);
 
   // This allows embedded players (YouTube, Vimeo) to handle their own play button initially
-  const initialPlayButton = useMemo(
-    () => deferToIframeControls && !started,
-    [deferToIframeControls, started]
+  const deferToIframeControls = useMemo(
+    () =>
+      !started && (service === 'vimeo' || service === 'youtube' || service === 'youtube-shorts'),
+    [service, started]
   );
 
   return error ? null : (
@@ -37,15 +44,15 @@ export const Overlay = ({
       style={{
         backgroundImage: showThumbnail ? `url(${thumbnail})` : undefined,
         backgroundColor: showThumbnail ? 'black' : 'transparent',
-        opacity: !paused ? 0 : 100,
-        pointerEvents: initialPlayButton && !started ? 'none' : 'auto'
+        opacity: !paused && !isInitialLoading ? 0 : 100, // hide the overlay if the video is not paused and not initial loading
+        pointerEvents: deferToIframeControls ? 'none' : 'auto'
       }}
       onClick={() => {
         // Only handle play/pause if:
         // - Not using iframe controls (YouTube, Vimeo)
         // - Player instance exists
         // - Player is ready
-        if (!initialPlayButton && player.current && ready) {
+        if (!deferToIframeControls && player.current && ready) {
           if (paused) {
             player.current.play();
           } else {
@@ -56,7 +63,7 @@ export const Overlay = ({
     >
       <div>{paused ? <IconPlayerPlayFilled /> : <IconPlayerPauseFilled />}</div>
 
-      {!ready && <div className="loader" />}
+      {isInitialLoading && <div className="loader" />}
     </div>
   );
 };

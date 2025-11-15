@@ -367,15 +367,7 @@ export const Player = forwardRef(
                  * Overlay component: Handles play button, loading states, and click-to-play
                  * deferToIframeControls: For YouTube/Vimeo, let iframe handle initial play
                  */}
-                <Overlay
-                  deferToIframeControls={
-                    video?.service === 'vimeo' ||
-                    video?.service === 'youtube' ||
-                    video?.service === 'youtube-shorts'
-                  }
-                  thumbnail={video?.thumbnail}
-                  player={playerRef}
-                />
+                <Overlay thumbnail={video?.thumbnail} service={video?.service} player={playerRef} />
                 {/**
                  * Controls component: Custom playback controls (play/pause, seek, volume, etc.)
                  */}
