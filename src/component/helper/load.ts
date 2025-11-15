@@ -3,22 +3,11 @@
  * Each entry contains the CDN URL and optional loading attributes.
  */
 const scripts = {
-  YT: {
-    src: 'https://www.youtube.com/iframe_api',
-    async: true
-  },
-  playerjs: {
-    src: 'https://assets.mediadelivery.net/playerjs/player-0.1.0.min.js'
-  },
-  Vimeo: {
-    src: 'https://player.vimeo.com/api/player.js'
-  },
-  Hls: {
-    src: 'https://cdn.jsdelivr.net/npm/hls.js@1'
-  },
-  dashjs: {
-    src: 'https://cdn.dashjs.org/latest/modern/umd/dash.all.min.js'
-  }
+  YT: 'https://www.youtube.com/iframe_api',
+  playerjs: 'https://assets.mediadelivery.net/playerjs/player-0.1.0.min.js',
+  Vimeo: 'https://player.vimeo.com/api/player.js',
+  Hls: 'https://cdn.jsdelivr.net/npm/hls.js@1',
+  dashjs: 'https://cdn.dashjs.org/latest/modern/umd/dash.all.min.js'
 };
 
 /**
@@ -38,24 +27,16 @@ export const loadLibrary = (
   timeout: number = 10000
 ): Promise<void> => {
   return new Promise((resolve, reject) => {
+    // get the source of the library
     const source = scripts[library as keyof typeof scripts];
 
     // Check if script tag already exists in the document head to avoid duplicate loading
-    if (!document.head.querySelector(`script[src="${source.src}"]`)) {
+    if (!document.head.querySelector(`script[src="${source}"]`)) {
       const script = document.createElement('script');
-      script.src = source.src;
+      script.src = source;
       script.type = 'text/javascript';
-      // Set async attribute if specified in the script configuration
-      if ((source as any).async) script.async = true;
-
-      // on load set the library to loaded
-      script.onload = () => {
-        // set the library to loaded
-        return (window as any).playerLoaded
-          ? ((window as any).playerLoaded[library] = true)
-          : ((window as any).playerLoaded = { [library]: true });
-      };
-
+      // Set async attribute
+      script.async = true;
       document.head.appendChild(script);
     }
 
@@ -67,7 +48,7 @@ export const loadLibrary = (
      */
     const check = () => {
       // Success: the library is now present on window → resolve the promise
-      if ((window as any).playerLoaded?.[library]) {
+      if (typeof window[library as keyof Window] !== 'undefined') {
         console.log(`${library} loaded`);
         resolve();
       } else if (Date.now() - startTime > timeout) {
