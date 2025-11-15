@@ -114,6 +114,66 @@ export const Player = forwardRef(
     const [error, setError] = useState<any>(null);
     const [live, setLive] = useState<boolean>(false);
 
+    // YouTube video thumbnail needs to be fetched asynchronously
+    // Unlike other services, YouTube thumbnails must be loaded via HTTP request
+    // to verify availability and quality, as not all videos have high-res thumbnails
+    const [youtubeThumbnail, setYoutubeThumbnail] = useState<string | undefined>(undefined);
+
+    /**
+     * Fetches the best available YouTube video thumbnail for a given video ID
+     *
+     * YouTube provides multiple thumbnail quality levels, but not all videos have
+     * all qualities available. This function tries qualities from highest to lowest
+     * and returns the first one that successfully loads and meets size requirements.
+     *
+     * @param id - YouTube video ID (e.g., "dQw4w9WgXcQ")
+     * @returns Promise resolving to the thumbnail URL string, or undefined if none found
+     *
+     * Quality order (highest to lowest):
+     * - maxresdefault: Maximum resolution (1280x720 or higher)
+     * - sddefault: Standard definition (640x480)
+     * - hqdefault: High quality (480x360)
+     * - mqdefault: Medium quality (320x180)
+     */
+    const getYtThumbnail = async (id: string): Promise<string | undefined> => {
+      return new Promise((resolve) => {
+        // Quality levels ordered from highest to lowest resolution
+        const qualities = ['maxresdefault', 'sddefault', 'hqdefault', 'mqdefault'];
+        /**
+         * Recursive function that attempts to load each quality level sequentially
+         * @param index - Current index in the qualities array
+         */
+        const tryImage = (index: number) => {
+          // If we've exhausted all quality options, resolve with undefined
+          if (index >= qualities.length) return resolve(undefined);
+
+          // Create a new Image object to test if the thumbnail URL is valid
+          const img = new Image();
+          // Construct YouTube thumbnail URL: https://i.ytimg.com/vi/{VIDEO_ID}/{QUALITY}.jpg
+          img.src = `https://i.ytimg.com/vi/${id}/${qualities[index]}.jpg`;
+
+          // Success handler: Image loaded successfully
+          img.onload = () => {
+            // Validation: If the image dimensions are too small (≤120x90),
+            // it's likely a placeholder/error image rather than an actual thumbnail.
+            // YouTube sometimes returns a small placeholder when a quality doesn't exist.
+            // In this case, try the next lower quality level.
+            if (img.width <= 120 && img.height <= 90) return tryImage(index + 1);
+
+            // Image is valid and meets size requirements, resolve with the URL
+            resolve(img.src);
+          };
+
+          // Error handler: Image failed to load (404, network error, etc.)
+          // Try the next lower quality level
+          img.onerror = () => tryImage(index + 1);
+        };
+
+        // Start the recursive quality checking process from the highest quality
+        tryImage(0);
+      });
+    };
+
     /**
      * Video Service Detection and Parsing
      * This memoized value parses the video source URL to determine:
@@ -187,12 +247,13 @@ export const Player = forwardRef(
         // YouTube Shorts use a different URL format but can be played with regular YouTube player
         const ytShorts = videoData.service === 'youtube' && src.includes('shorts');
 
+        // Generate YouTube thumbnail URL if available
+        if (videoData.service === 'youtube')
+          getYtThumbnail(videoData.id)
+            .then((url) => setYoutubeThumbnail(url))
+            .catch(() => setYoutubeThumbnail(undefined));
+
         return {
-          // Generate YouTube thumbnail URL if available
-          thumbnail:
-            videoData.service === 'youtube'
-              ? `https://i.ytimg.com/vi/${videoData.id}/sddefault.jpg`
-              : undefined,
           src,
           service: ytShorts ? 'youtube-shorts' : videoData.service,
           id: videoData.id
@@ -203,7 +264,7 @@ export const Player = forwardRef(
     }, [src, config]);
 
     /**
-     * Reset player state when video source changes
+     * Reset player state when video source changes (YouTube thumbnail is also reset)
      * This ensures clean state when switching between videos
      */
     useEffect(() => {
@@ -217,6 +278,9 @@ export const Player = forwardRef(
       setPlaybackRate(1);
       setError(null);
       setLive(false);
+
+      // Reset YouTube thumbnail state when video source changes
+      setYoutubeThumbnail(undefined);
     }, [video]);
 
     /**
@@ -369,9 +433,12 @@ export const Player = forwardRef(
               <>
                 {/**
                  * Overlay component: Handles play button, loading states, and click-to-play
-                 * deferToIframeControls: For YouTube/Vimeo, let iframe handle initial play
                  */}
-                <Overlay thumbnail={video?.thumbnail} service={video?.service} player={playerRef} />
+                <Overlay
+                  thumbnail={youtubeThumbnail || video?.thumbnail}
+                  service={video?.service}
+                  player={playerRef}
+                />
                 {/**
                  * Controls component: Custom playback controls (play/pause, seek, volume, etc.)
                  */}
