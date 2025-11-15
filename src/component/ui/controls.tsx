@@ -280,80 +280,82 @@ export const Controls = ({
 
       {!onlyShowSeekbar && (
         <div className="group-btn-controls">
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger asChild>
-              <button>
-                <IconSettingsFilled />
-              </button>
-            </DropdownMenu.Trigger>
+          {!live && (
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
+                <button>
+                  <IconSettingsFilled />
+                </button>
+              </DropdownMenu.Trigger>
 
-            <DropdownMenu.Portal container={container.current}>
-              <DropdownMenu.Content className="DropdownMenuContent" side="top" sideOffset={5}>
-                <DropdownMenu.Sub>
-                  <DropdownMenu.SubTrigger className="DropdownMenuSubTrigger">
-                    Speed
-                    <div className="RightSlot">
-                      <IconChevronRight />
-                    </div>
-                  </DropdownMenu.SubTrigger>
-                  <DropdownMenu.Portal container={container.current}>
-                    <DropdownMenu.SubContent
-                      className="DropdownMenuSubContent"
-                      sideOffset={2}
-                      alignOffset={-5}
-                    >
-                      {[
-                        {
-                          value: 0.25,
-                          label: '0.25x'
-                        },
-                        {
-                          value: 0.5,
-                          label: '0.5x'
-                        },
-                        {
-                          value: 0.75,
-                          label: '0.75x'
-                        },
-                        {
-                          value: 1,
-                          label: 'Normal'
-                        },
-                        {
-                          value: 1.25,
-                          label: '1.25x'
-                        },
-                        {
-                          value: 1.5,
-                          label: '1.5x'
-                        },
-                        {
-                          value: 1.75,
-                          label: '1.75x'
-                        },
-                        {
-                          value: 2,
-                          label: '2x'
-                        }
-                      ].map((v) => (
-                        <DropdownMenu.CheckboxItem
-                          key={v.value}
-                          className="DropdownMenuCheckboxItem"
-                          checked={v.value === playbackRate ? true : false}
-                          onCheckedChange={() => player.current.setPlaybackRate(v.value)}
-                        >
-                          <DropdownMenu.ItemIndicator className="DropdownMenuItemIndicator">
-                            <IconCircleCheckFilled />
-                          </DropdownMenu.ItemIndicator>
-                          {v.label}
-                        </DropdownMenu.CheckboxItem>
-                      ))}
-                    </DropdownMenu.SubContent>
-                  </DropdownMenu.Portal>
-                </DropdownMenu.Sub>
-              </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-          </DropdownMenu.Root>
+              <DropdownMenu.Portal container={container.current}>
+                <DropdownMenu.Content className="DropdownMenuContent" side="top" sideOffset={5}>
+                  <DropdownMenu.Sub>
+                    <DropdownMenu.SubTrigger className="DropdownMenuSubTrigger">
+                      Speed
+                      <div className="RightSlot">
+                        <IconChevronRight />
+                      </div>
+                    </DropdownMenu.SubTrigger>
+                    <DropdownMenu.Portal container={container.current}>
+                      <DropdownMenu.SubContent
+                        className="DropdownMenuSubContent"
+                        sideOffset={2}
+                        alignOffset={-5}
+                      >
+                        {[
+                          {
+                            value: 0.25,
+                            label: '0.25x'
+                          },
+                          {
+                            value: 0.5,
+                            label: '0.5x'
+                          },
+                          {
+                            value: 0.75,
+                            label: '0.75x'
+                          },
+                          {
+                            value: 1,
+                            label: 'Normal'
+                          },
+                          {
+                            value: 1.25,
+                            label: '1.25x'
+                          },
+                          {
+                            value: 1.5,
+                            label: '1.5x'
+                          },
+                          {
+                            value: 1.75,
+                            label: '1.75x'
+                          },
+                          {
+                            value: 2,
+                            label: '2x'
+                          }
+                        ].map((v) => (
+                          <DropdownMenu.CheckboxItem
+                            key={v.value}
+                            className="DropdownMenuCheckboxItem"
+                            checked={v.value === playbackRate ? true : false}
+                            onCheckedChange={() => player.current.setPlaybackRate(v.value)}
+                          >
+                            <DropdownMenu.ItemIndicator className="DropdownMenuItemIndicator">
+                              <IconCircleCheckFilled />
+                            </DropdownMenu.ItemIndicator>
+                            {v.label}
+                          </DropdownMenu.CheckboxItem>
+                        ))}
+                      </DropdownMenu.SubContent>
+                    </DropdownMenu.Portal>
+                  </DropdownMenu.Sub>
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
+          )}
 
           <button
             onClick={() => {
