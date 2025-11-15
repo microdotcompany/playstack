@@ -11,7 +11,16 @@ const App = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
-      <Player ref={playerRef} src={src} onTitleChange={(title) => console.log('title', title)} />
+      <Player
+        ref={playerRef}
+        src={src}
+        onTitleChange={(title) => console.log('title', title)}
+        config={{
+          youtube: {
+            noCookie: false
+          }
+        }}
+      />
 
       <div
         style={{
