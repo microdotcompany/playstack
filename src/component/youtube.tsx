@@ -171,9 +171,13 @@ const Youtube = forwardRef(({ id, defaultControls, src }: YoutubeProps, ref: any
 
     // Cleanup: destroy player and remove event listeners on unmount
     return () => {
-      if (playerRef.current) {
-        playerRef.current.destroy();
-        window.removeEventListener('message', onMessage);
+      try {
+        if (playerRef.current) {
+          playerRef.current.destroy();
+          window.removeEventListener('message', onMessage);
+        }
+      } catch (error) {
+        console.error('Error destroying YouTube player', error);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

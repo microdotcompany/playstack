@@ -193,26 +193,33 @@ const Video = forwardRef(({ src }: { src: string }, ref: any) => {
 
     // Cleanup: remove all event listeners when component unmounts or src changes
     return () => {
-      if (hlsRef.current) {
-        hlsRef.current.destroy();
-        hlsRef.current = null;
-      }
-      if (dashRef.current) {
-        dashRef.current.destroy();
-        dashRef.current = null;
-      }
+      try {
+        if (hlsRef.current) {
+          hlsRef.current.destroy();
+          hlsRef.current = null;
+        }
+        if (dashRef.current) {
+          dashRef.current.destroy();
+          dashRef.current = null;
+        }
 
-      if (!videoRef.current) return;
+        if (!videoRef.current) return;
 
-      videoRef.current.removeEventListener('canplay', onCanPlay);
-      videoRef.current.removeEventListener('timeupdate', onTimeUpdate);
-      videoRef.current.removeEventListener('play', onPlay);
-      videoRef.current.removeEventListener('pause', onPause);
-      videoRef.current.removeEventListener('ended', onEnded);
-      videoRef.current.removeEventListener('waiting', onWaiting);
-      videoRef.current.removeEventListener('playing', onPlaying);
-      videoRef.current.removeEventListener('volumechange', onVolumeChange);
-      videoRef.current.removeEventListener('ratechange', onRateChange);
+        videoRef.current.removeEventListener('canplay', onCanPlay);
+        videoRef.current.removeEventListener('timeupdate', onTimeUpdate);
+        videoRef.current.removeEventListener('play', onPlay);
+        videoRef.current.removeEventListener('pause', onPause);
+        videoRef.current.removeEventListener('ended', onEnded);
+        videoRef.current.removeEventListener('waiting', onWaiting);
+        videoRef.current.removeEventListener('playing', onPlaying);
+        videoRef.current.removeEventListener('volumechange', onVolumeChange);
+        videoRef.current.removeEventListener('ratechange', onRateChange);
+      } catch (error) {
+        console.error(
+          'Error destroying HLS and DASH and removing event listeners from HTML5 video player',
+          error
+        );
+      }
     };
   }, [src, videoRef]);
 

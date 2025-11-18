@@ -204,7 +204,16 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
 
     // Cleanup: Destroy player instance when component unmounts or dependencies change
     return () => {
-      if (playerRef.current) playerRef.current.destroy();
+      if (playerRef.current) {
+        playerRef.current
+          .destroy()
+          .then(() => {
+            console.log('Vimeo player destroyed');
+          })
+          .catch((error: any) => {
+            console.error('Error destroying Vimeo player', error);
+          });
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url, defaultControls, vimeoPlayerRef, isIOS]);
