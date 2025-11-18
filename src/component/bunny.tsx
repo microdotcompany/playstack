@@ -57,14 +57,6 @@ export const Bunny = forwardRef(({ src, thumbnail, id }: props, ref) => {
           console.error(error);
         });
     }
-
-    // Cleanup function to remove event listeners when component unmounts
-    return () => {
-      if (playerRef.current) {
-        playerRef.current.off('ready');
-        playerRef.current.off('timeupdate');
-      }
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src]);
 
