@@ -286,7 +286,7 @@ export const Player = forwardRef(
 
       // Reset YouTube thumbnail state when video source changes
       setYoutubeThumbnail(undefined);
-    }, [video]);
+    }, [src]);
 
     /**
      * Apply theme color to CSS custom property
