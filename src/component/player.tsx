@@ -254,7 +254,12 @@ export const Player = forwardRef(
             .catch(() => setYoutubeThumbnail(undefined));
 
         return {
-          src,
+          src:
+            videoData.service === 'youtube'
+              ? ytShorts || !config?.youtube?.noCookie
+                ? 'https://www.youtube.com'
+                : 'https://www.youtube-nocookie.com'
+              : src,
           service: ytShorts ? 'youtube-shorts' : videoData.service,
           id: videoData.id
         };
@@ -399,9 +404,8 @@ export const Player = forwardRef(
             <Youtube
               ref={playerRef}
               id={video.id}
-              service={video.service}
+              src={video.src}
               defaultControls={config?.defaultControls}
-              noCookie={config?.youtube?.noCookie}
             />
           ) : video?.service === 'vimeo' ? (
             <Vimeo
