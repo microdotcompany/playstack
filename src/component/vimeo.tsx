@@ -1,4 +1,4 @@
-import { forwardRef, useContext, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
+import { forwardRef, useContext, useEffect, useImperativeHandle, useRef } from 'react';
 import { ContextProvider } from './player';
 import { loadLibrary } from './helper/load';
 
@@ -7,7 +7,6 @@ import { loadLibrary } from './helper/load';
  */
 interface VimeoProps {
   src: string;
-  id: string;
   defaultControls?: boolean;
 }
 
@@ -15,7 +14,7 @@ interface VimeoProps {
  * Vimeo player component that wraps the Vimeo Player API
  * Integrates with the player context to sync state and expose control methods
  */
-export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: any) => {
+export const Vimeo = forwardRef(({ src, defaultControls }: VimeoProps, ref: any) => {
   // Reference to the Vimeo Player instance
   const playerRef = useRef<any>(null);
 
@@ -39,12 +38,6 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
     setError,
     setLive
   } = useContext(ContextProvider);
-
-  // Construct the Vimeo player URL with hash parameter for unlisted videos
-  const url = useMemo(() => {
-    const hash = new URLSearchParams(src).get('h');
-    return `https://player.vimeo.com/video/${id}?h=${hash}`;
-  }, [src, id]);
 
   useEffect(() => {
     /**
@@ -162,7 +155,7 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
       .then(() => {
         // Create new Vimeo Player instance
         playerRef.current = new window.Vimeo.Player(vimeoPlayerRef.current, {
-          url: url,
+          url: src,
           autoplay: false,
           controls: true,
           muted: false,
@@ -216,7 +209,7 @@ export const Vimeo = forwardRef(({ src, id, defaultControls }: VimeoProps, ref: 
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [url, defaultControls, vimeoPlayerRef, isIOS]);
+  }, [src, defaultControls, vimeoPlayerRef, isIOS]);
 
   /**
    * Expose player control methods to parent components via ref

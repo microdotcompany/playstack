@@ -408,12 +408,7 @@ export const Player = forwardRef(
               defaultControls={config?.defaultControls}
             />
           ) : video?.service === 'vimeo' ? (
-            <Vimeo
-              ref={playerRef}
-              id={video.id}
-              src={video.src}
-              defaultControls={config?.defaultControls}
-            />
+            <Vimeo ref={playerRef} src={video.src} defaultControls={config?.defaultControls} />
           ) : video?.service === 'bunny' ? (
             <Bunny {...video} ref={(player) => (playerRef.current = player)} />
           ) : video?.service === 'gdrive' ? (
