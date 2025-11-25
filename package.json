@@ -11,7 +11,7 @@
   "homepage": "https://github.com/microdotcompany/playstack#readme",
   "license": "MIT",
   "private": false,
-  "version": "2.0.4",
+  "version": "2.0.5",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
