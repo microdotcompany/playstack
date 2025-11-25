@@ -415,7 +415,9 @@ export const Player = forwardRef(
             <GDrive src={video.src} ref={playerRef} />
           ) : (
             // Generic HTML5 video player for direct video URLs and HLS/DASH streams
-            video?.src && <Video src={video.src} ref={playerRef} />
+            video?.src && (
+              <Video src={video.src} ref={playerRef} defaultControls={config?.defaultControls} />
+            )
           )}
 
           {/**

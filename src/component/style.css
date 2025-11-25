@@ -423,9 +423,9 @@
   aspect-ratio: 9/16;
 }
 
-/* YouTube Shorts iframe - auto width */
-.playstack-player-container:is(.youtube-shorts) .iframe {
-  width: auto !important;
+/* YouTube Shorts iframe - max width 500px in fullscreen mode */
+.playstack-player-container:not(.default-controls):has(.fullscreen):is(.youtube-shorts) iframe {
+  max-width: 500px !important;
 }
 
 /* ============================================================================
@@ -445,7 +445,8 @@
 }
 
 /* YouTube custom controls - full width */
-.playstack-player-container:not(.default-controls):is(.youtube) iframe {
+.playstack-player-container:not(.default-controls):is(.youtube) iframe,
+.playstack-player-container:not(.default-controls):is(.youtube-shorts) iframe {
   width: 100% !important;
 }
 
