@@ -93,8 +93,10 @@ export const Player = forwardRef(
      * This is important because iOS has special handling for video playback and volume control
      */
     const isIOS =
-      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      typeof window !== 'undefined' // check if window is defined
+        ? /iPad|iPhone|iPod/.test(navigator.userAgent) || // check if user agent is iOS
+          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) // check if platform is MacIntel and max touch points is greater than 1
+        : false; // if window is not defined, return false
 
     // Ref to the actual player instance (Youtube, Vimeo, Video, etc.)
     const playerRef = useRef<any>(null);
