@@ -202,6 +202,7 @@ export const Vimeo = forwardRef(({ src, defaultControls }: VimeoProps, ref: any)
         playerRef.current
           .destroy()
           .then(() => {
+            playerRef.current = null;
             console.log('Vimeo player destroyed');
           })
           .catch((error: any) => {

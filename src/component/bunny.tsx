@@ -64,6 +64,7 @@ export const Bunny = forwardRef(({ src, thumbnail, id }: props, ref) => {
         if (playerRef.current) {
           playerRef.current.off('ready');
           playerRef.current.off('timeupdate');
+          playerRef.current = null;
         }
       } catch (error) {
         console.error('Error removing event listeners for bunny player', error);

@@ -176,6 +176,7 @@ const Youtube = forwardRef(({ id, defaultControls, src }: YoutubeProps, ref: any
       try {
         if (playerRef.current) {
           playerRef.current.destroy();
+          playerRef.current = null;
           window.removeEventListener('message', onMessage);
         }
       } catch (error) {
