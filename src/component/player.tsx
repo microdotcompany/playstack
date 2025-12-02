@@ -37,7 +37,7 @@ declare global {
  * Defines all configurable options and event callbacks for the video player
  */
 export interface PlayerProps {
-  src: string; // Video source URL
+  src?: string; // Video source URL
   config?: {
     bunny?: {
       id: string; // Bunny.net video ID
@@ -200,13 +200,16 @@ export const Player = forwardRef(
 
       if (src || bunny?.id) {
         // Handle Bunny video service (requires explicit config)
-        if (bunny?.id)
+        if (bunny?.id) {
+          // Only return bunny video if we have a valid src or the bunny config is complete
+          if (!src && !bunny.hostname) return null;
           return {
             thumbnail: `https://${bunny.hostname}/${bunny.id}/thumbnail.jpg`,
             service: 'bunny',
-            src,
+            src: src || '',
             id: bunny.id
           };
+        }
 
         // Security: Only allow valid HTTPS URLs or blob URLs for video sources
         // Prevents XSS attacks and ensures secure video loading
@@ -392,64 +395,68 @@ export const Player = forwardRef(
           setLive
         }}
       >
-        <div
-          ref={containerRef}
-          className={`playstack-player-container ${video?.service} ${started ? 'started' : ''} ${
-            config?.defaultControls || error ? 'default-controls' : ''
-          }`}
-        >
-          {/**
-           * Conditional rendering of video player components based on detected service
-           * Each service has its own implementation with different capabilities
-           */}
-          {video?.service === 'youtube' || video?.service === 'youtube-shorts' ? (
-            <Youtube
-              ref={playerRef}
-              id={video.id}
-              src={video.src}
-              defaultControls={config?.defaultControls}
-            />
-          ) : video?.service === 'vimeo' ? (
-            <Vimeo ref={playerRef} src={video.src} defaultControls={config?.defaultControls} />
-          ) : video?.service === 'bunny' ? (
-            <Bunny {...video} ref={(player) => (playerRef.current = player)} />
-          ) : video?.service === 'gdrive' ? (
-            <GDrive src={video.src} ref={playerRef} />
-          ) : (
-            // Generic HTML5 video player for direct video URLs and HLS/DASH streams
-            video?.src && (
-              <Video src={video.src} ref={playerRef} defaultControls={config?.defaultControls} />
-            )
-          )}
-
-          {/**
-           * Conditional rendering of custom controls and overlay
-           * Only shown when:
-           * - defaultControls is false (not using native controls)
-           * - hidePlayerControls is false (controls not explicitly hidden)
-           * - Service is not bunny or gdrive (these have built-in controls)
-           */}
-          {!config?.defaultControls &&
-            !config?.hidePlayerControls &&
-            video?.service !== 'bunny' &&
-            video?.service !== 'gdrive' && (
-              <>
-                {/**
-                 * Overlay component: Handles play button, loading states, and click-to-play
-                 */}
-                <Overlay
-                  thumbnail={youtubeThumbnail || video?.thumbnail}
-                  service={video?.service}
-                  player={playerRef}
-                />
-                {/**
-                 * Controls component: Custom playback controls (play/pause, seek, volume, etc.)
-                 */}
-                <Controls container={containerRef} player={playerRef} service={video?.service} />
-              </>
+        {video ? (
+          <div
+            ref={containerRef}
+            className={`playstack-player-container ${video.service} ${started ? 'started' : ''} ${
+              config?.defaultControls || error ? 'default-controls' : ''
+            }`}
+          >
+            {/**
+             * Conditional rendering of video player components based on detected service
+             * Each service has its own implementation with different capabilities
+             */}
+            {video.service === 'youtube' || video.service === 'youtube-shorts' ? (
+              <Youtube
+                ref={playerRef}
+                id={video.id}
+                src={video.src}
+                defaultControls={config?.defaultControls}
+              />
+            ) : video.service === 'vimeo' ? (
+              <Vimeo ref={playerRef} src={video.src} defaultControls={config?.defaultControls} />
+            ) : video.service === 'bunny' ? (
+              <Bunny {...video} ref={(player) => (playerRef.current = player)} />
+            ) : video.service === 'gdrive' ? (
+              <GDrive src={video.src} ref={playerRef} />
+            ) : (
+              // Generic HTML5 video player for direct video URLs and HLS/DASH streams
+              video.src && (
+                <Video src={video.src} ref={playerRef} defaultControls={config?.defaultControls} />
+              )
             )}
-        </div>
+
+            {/**
+             * Conditional rendering of custom controls and overlay
+             * Only shown when:
+             * - defaultControls is false (not using native controls)
+             * - hidePlayerControls is false (controls not explicitly hidden)
+             * - Service is not bunny or gdrive (these have built-in controls)
+             */}
+            {!config?.defaultControls &&
+              !config?.hidePlayerControls &&
+              video.service !== 'bunny' &&
+              video.service !== 'gdrive' && (
+                <>
+                  {/**
+                   * Overlay component: Handles play button, loading states, and click-to-play
+                   */}
+                  <Overlay
+                    thumbnail={youtubeThumbnail || video.thumbnail}
+                    service={video.service}
+                    player={playerRef}
+                  />
+                  {/**
+                   * Controls component: Custom playback controls (play/pause, seek, volume, etc.)
+                   */}
+                  <Controls container={containerRef} player={playerRef} service={video.service} />
+                </>
+              )}
+          </div>
+        ) : null}
       </ContextProvider.Provider>
     );
   }
 );
+
+Player.displayName = 'Player';

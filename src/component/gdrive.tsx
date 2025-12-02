@@ -20,3 +20,5 @@ export const GDrive = forwardRef(({ src }: props, ref: LegacyRef<HTMLIFrameEleme
     </>
   );
 });
+
+GDrive.displayName = 'GDrive';

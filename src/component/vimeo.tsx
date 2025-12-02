@@ -302,3 +302,5 @@ export const Vimeo = forwardRef(({ src, defaultControls }: VimeoProps, ref: any)
 
   return <div ref={vimeoPlayerRef} className="vimeo-player" />;
 });
+
+Vimeo.displayName = 'Vimeo';

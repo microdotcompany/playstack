@@ -32,7 +32,7 @@ export const Bunny = forwardRef(({ src, thumbnail, id }: props, ref) => {
 
   // Initialize the Bunny.net player when the video source changes
   useEffect(() => {
-    if (src) {
+    if (src && src.length > 1) {
       // Wait for the Player.js library to load before initializing
       loadLibrary('playerjs')
         .then(() => {
@@ -101,3 +101,5 @@ export const Bunny = forwardRef(({ src, thumbnail, id }: props, ref) => {
     </>
   );
 });
+
+Bunny.displayName = 'Bunny';

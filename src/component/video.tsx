@@ -310,4 +310,6 @@ const Video = forwardRef(
   }
 );
 
+Video.displayName = 'Video';
+
 export default Video;

@@ -262,4 +262,6 @@ const Youtube = forwardRef(({ id, defaultControls, src }: YoutubeProps, ref: any
   return <div ref={youtubePlayerRef} className="youtube-player" />;
 });
 
+Youtube.displayName = 'Youtube';
+
 export default Youtube;
