@@ -5,7 +5,7 @@ import { loadLibrary } from './helper/load';
 // Component props interface for YouTube player
 interface YoutubeProps {
   id: string;
-  src?: string;
+  src: string;
   defaultControls?: boolean;
 }
 const Youtube = forwardRef(({ id, defaultControls, src }: YoutubeProps, ref: any) => {
@@ -125,6 +125,8 @@ const Youtube = forwardRef(({ id, defaultControls, src }: YoutubeProps, ref: any
     loadLibrary('YT')
       .then(() => {
         window.YT.ready(() => {
+          if (!(id && src)) return;
+
           const div = document.createElement('div');
 
           // Remove existing player if present (handles re-initialization)

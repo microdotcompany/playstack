@@ -63,6 +63,8 @@ const Video = forwardRef(
           // Use HLS.js library for browsers without native HLS support
           loadLibrary('Hls')
             .then(() => {
+              if (!url) return;
+
               if (window.Hls.isSupported()) {
                 hlsRef.current = new window.Hls();
                 hlsRef.current.loadSource(url);
@@ -77,6 +79,8 @@ const Video = forwardRef(
         // DASH (Dynamic Adaptive Streaming over HTTP) format
         loadLibrary('dashjs')
           .then(() => {
+            if (!src) return;
+
             dashRef.current = window.dashjs.MediaPlayer().create();
             dashRef.current.initialize(videoRef.current, src, false);
           })

@@ -32,31 +32,31 @@ export const Bunny = forwardRef(({ src, thumbnail, id }: props, ref) => {
 
   // Initialize the Bunny.net player when the video source changes
   useEffect(() => {
-    if (src && src.length > 1) {
-      // Wait for the Player.js library to load before initializing
-      loadLibrary('playerjs')
-        .then(() => {
-          // Create new player instance with the iframe element
-          playerRef.current = new window.playerjs.Player(iframe.current);
+    // Wait for the Player.js library to load before initializing
+    loadLibrary('playerjs')
+      .then(() => {
+        if (!(src && src.length > 1)) return;
 
-          // Register event handlers when the player is ready
-          playerRef.current.on('ready', () => {
-            setReady(true);
-            // Set iframe background to black once the player is ready
-            if (iframe.current) iframe.current.style.background = 'black';
-            // Fetch and set the video duration
-            playerRef.current.getDuration((duration: number) => setDuration(duration));
+        // Create new player instance with the iframe element
+        playerRef.current = new window.playerjs.Player(iframe.current);
 
-            // Listen for time updates and call the callback with current time and duration
-            playerRef.current.on('timeupdate', (time: any) => {
-              setCurrentTime(time.seconds);
-            });
+        // Register event handlers when the player is ready
+        playerRef.current.on('ready', () => {
+          setReady(true);
+          // Set iframe background to black once the player is ready
+          if (iframe.current) iframe.current.style.background = 'black';
+          // Fetch and set the video duration
+          playerRef.current.getDuration((duration: number) => setDuration(duration));
+
+          // Listen for time updates and call the callback with current time and duration
+          playerRef.current.on('timeupdate', (time: any) => {
+            setCurrentTime(time.seconds);
           });
-        })
-        .catch((error) => {
-          console.error(error);
         });
-    }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 
     // Cleanup function to remove event listeners when component unmounts
     return () => {

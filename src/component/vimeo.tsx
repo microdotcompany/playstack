@@ -153,6 +153,7 @@ export const Vimeo = forwardRef(({ src, defaultControls }: VimeoProps, ref: any)
     // Wait for Vimeo Player library to load, then initialize the player
     loadLibrary('Vimeo')
       .then(() => {
+        if (!src) return;
         // Create new Vimeo Player instance
         playerRef.current = new window.Vimeo.Player(vimeoPlayerRef.current, {
           url: src,
