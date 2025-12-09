@@ -27,6 +27,12 @@ export const Overlay = ({
     [started, state, ready]
   );
 
+  // Determine if video is not started and service is youtube or youtube-shorts
+  const isYtNotStarted = useMemo(
+    () => !started && (service === 'youtube' || service === 'youtube-shorts'),
+    [started, service]
+  );
+
   // Show thumbnail only if video hasn't started and a thumbnail URL is provided
   const showThumbnail = useMemo(() => !started && thumbnail, [started, thumbnail]);
 
@@ -43,7 +49,7 @@ export const Overlay = ({
       className="control-overlaid"
       style={{
         backgroundImage: showThumbnail ? `url(${thumbnail})` : undefined,
-        backgroundColor: showThumbnail ? 'black' : 'transparent',
+        backgroundColor: showThumbnail || isYtNotStarted ? 'black' : 'transparent', // show black background if thumbnail is shown or video is not started and service is youtube
         opacity: !paused && !isInitialLoading ? 0 : 100, // hide the overlay if the video is not paused and not initial loading
         pointerEvents: deferToIframeControls ? 'none' : 'auto'
       }}

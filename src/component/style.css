@@ -480,20 +480,6 @@
 }
 
 /* ============================================================================
-   PLAYER STATE STYLES
-   ============================================================================ */
-
-/* When player has started - show iframe */
-.playstack-player-container:is(.started) iframe {
-  opacity: 1 !important;
-}
-
-/* YouTube player - hide iframe until started (when not using default controls) */
-.playstack-player-container:has(.youtube-player):not(.started):not(.default-controls) iframe {
-  opacity: 0 !important;
-}
-
-/* ============================================================================
    PLAYER WRAPPER STYLES
    ============================================================================ */
 
