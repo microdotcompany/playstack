@@ -56,6 +56,7 @@ export interface PlayerProps {
   onReady?: (player: any) => void; // Fires when player is ready
   onVolumeChange?: (data: { volume: number; muted: boolean }) => void; // Fires when volume/mute changes (not supported on bunny and gdrive)
   onPlaybackRateChange?: (playbackRate: number) => void; // Fires when playback speed changes (not supported on bunny and gdrive)
+  onStateChange?: (state: 'playing' | 'paused' | 'buffering') => void; // Fires when player state changes
 }
 
 /**
@@ -83,7 +84,8 @@ export const Player = forwardRef(
       onTitleChange,
       onReady,
       onVolumeChange,
-      onPlaybackRateChange
+      onPlaybackRateChange,
+      onStateChange
     }: PlayerProps,
     ref: any
   ) => {
@@ -361,6 +363,14 @@ export const Player = forwardRef(
       if (onPlaybackRateChange) onPlaybackRateChange(playbackRate);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [playbackRate]);
+
+    /**
+     * Callback: Notify parent component of state changes
+     */
+    useEffect(() => {
+      if (onStateChange) onStateChange(state as any);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [state]);
 
     /**
      * Expose player instance to parent component via ref

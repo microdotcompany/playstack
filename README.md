@@ -105,6 +105,7 @@ function App() {
 | `onReady`                   | `(player: any) => void`                                 | -           | Callback when player is ready (receives player instance)                                                                                                               |
 | `onVolumeChange`            | `(data: { volume: number; muted: boolean }) => void`    | -           | Callback when volume or mute state changes (does not work on Bunny Stream and Google Drive)                                                                            |
 | `onPlaybackRateChange`      | `(playbackRate: number) => void`                        | -           | Callback when playback rate changes (does not work on Bunny Stream and Google Drive)                                                                                   |
+| `onStateChange`             | `(state: 'playing' \| 'paused' \| 'buffering') => void` | -           | Callback when player state changes                                                                                                                                     |
 
 ### Player Ref
 
@@ -327,6 +328,18 @@ You can hide all custom controls:
 ```
 
 **Note**: `onVolumeChange` and `onPlaybackRateChange` do not work with Bunny Stream and Google Drive.
+
+### State Change Tracking
+
+```tsx
+<Player
+  src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+  onStateChange={(state) => {
+    console.log(`Player state: ${state}`);
+    // state is one of: 'playing', 'paused', 'buffering'
+  }}
+/>
+```
 
 ## Browser Support
 

@@ -23,7 +23,7 @@ export const Bunny = forwardRef(({ src, thumbnail, id }: props, ref) => {
   const playerRef = useRef<any>(null);
 
   // Access player state and setters from the context provider
-  const { setDuration, setCurrentTime, ready, setReady } = useContext(ContextProvider);
+  const { setDuration, setCurrentTime, ready, setReady, setState } = useContext(ContextProvider);
 
   // Initialize iframe background to transparent when component mounts or id changes
   useEffect(() => {
@@ -52,6 +52,16 @@ export const Bunny = forwardRef(({ src, thumbnail, id }: props, ref) => {
           playerRef.current.on('timeupdate', (time: any) => {
             setCurrentTime(time.seconds);
           });
+
+          // Listen for play event and set the state to playing
+          playerRef.current.on('play', () => {
+            setState('playing');
+          });
+
+          // Listen for pause event and set the state to paused
+          playerRef.current.on('pause', () => {
+            setState('paused');
+          });
         });
       })
       .catch((error) => {
@@ -64,6 +74,8 @@ export const Bunny = forwardRef(({ src, thumbnail, id }: props, ref) => {
         if (playerRef.current) {
           playerRef.current.off('ready');
           playerRef.current.off('timeupdate');
+          playerRef.current.off('play');
+          playerRef.current.off('pause');
           playerRef.current = null;
         }
       } catch (error) {

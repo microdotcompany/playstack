@@ -24,6 +24,7 @@ const App = () => {
           ref={playerRef}
           src={src}
           onTitleChange={(title) => console.log('title', title)}
+          onStateChange={(state) => console.log('state', state)}
           config={{
             youtube: {
               noCookie: false
