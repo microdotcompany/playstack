@@ -341,7 +341,9 @@
   background-color: white;
   border-radius: 3px;
   padding: 5px;
-  box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2);
+  box-shadow:
+    0px 10px 38px -10px rgba(22, 23, 24, 0.35),
+    0px 10px 20px -15px rgba(22, 23, 24, 0.2);
   animation-duration: 400ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;
@@ -420,46 +422,36 @@
 }
 
 /* ============================================================================
-   YOUTUBE SHORTS SPECIFIC STYLES
-   ============================================================================ */
-
-/* YouTube Shorts - vertical aspect ratio (9:16) */
-.playstack-player-container:is(.youtube-shorts) {
-  aspect-ratio: 9/16;
-}
-
-/* YouTube Shorts iframe - max width 500px in fullscreen mode */
-.playstack-player-container:not(.default-controls):has(.fullscreen):is(.youtube-shorts) iframe {
-  max-width: 500px !important;
-}
-
-/* ============================================================================
    CUSTOM CONTROLS IFRAME STYLING
    ============================================================================ */
 
-/* Custom controls mode - iframe scaling for YouTube Shorts, YouTube, and Vimeo */
-/* Uses oversized iframe with scaling to enable custom controls */
-.playstack-player-container:not(.default-controls):is(.youtube-shorts) iframe,
+/* Vimeo and YouTube iframe default common styles */
 .playstack-player-container:not(.default-controls):is(.youtube) iframe,
 .playstack-player-container:not(.default-controls):is(.vimeo) iframe {
-  height: 1000% !important;
+  aspect-ratio: 16/9;
   vertical-align: middle !important;
   display: block !important;
   position: absolute !important;
   border: none !important;
 }
 
-/* YouTube custom controls - full width */
-.playstack-player-container:not(.default-controls):is(.youtube) iframe,
-.playstack-player-container:not(.default-controls):is(.youtube-shorts) iframe {
-  width: 100% !important;
+/* YouTube iframe scaling */
+.playstack-player-container:not(.default-controls):is(.youtube) iframe {
+  height: 1000% !important;
+  width: 1500% !important;
+  scale: 0.085;
+}
+
+/* Vimeo iframe scaling */
+.playstack-player-container:not(.default-controls):is(.vimeo) iframe {
+  height: 1000% !important;
+  width: 1000% !important;
+  scale: 0.1;
 }
 
 /* Vimeo custom controls - oversized and scaled down (10x scale) */
 /* This technique allows custom controls to overlay the video */
 .playstack-player-container:not(.default-controls):is(.vimeo) iframe {
-  width: 1000% !important;
-  scale: 0.1;
   margin-top: 1rem;
 }
 
@@ -497,9 +489,13 @@
   height: inherit;
 }
 
-/* Vimeo player in fullscreen - allow auto height */
-.playstack-player-container:has(.fullscreen) .vimeo-player {
-  height: auto !important;
+/* Fullscreen YouTube scaling for portrait mode */
+@media screen and (orientation: portrait) and (max-width: 480px) and (min-height: 600px) {
+  .playstack-player-container:has(.fullscreen):not(.default-controls):is(.youtube) iframe {
+    height: 1500% !important;
+    width: 1000% !important;
+    scale: 0.099 !important;
+  }
 }
 
 /* ============================================================================

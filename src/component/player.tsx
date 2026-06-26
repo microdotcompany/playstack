@@ -250,10 +250,6 @@ export const Player = forwardRef(
         // Validation: If get-video-id couldn't extract an ID, return null
         if (!videoData.id) return null;
 
-        // Special handling for YouTube Shorts
-        // YouTube Shorts use a different URL format but can be played with regular YouTube player
-        const ytShorts = videoData.service === 'youtube' && src.includes('shorts');
-
         // Generate YouTube thumbnail URL if available
         if (videoData.service === 'youtube')
           getYtThumbnail(videoData.id)
@@ -263,11 +259,11 @@ export const Player = forwardRef(
         return {
           src:
             videoData.service === 'youtube'
-              ? ytShorts || !config?.youtube?.noCookie
+              ? !config?.youtube?.noCookie
                 ? 'https://www.youtube.com'
                 : 'https://www.youtube-nocookie.com'
               : src,
-          service: ytShorts ? 'youtube-shorts' : videoData.service,
+          service: videoData.service,
           id: videoData.id
         };
       }
@@ -416,7 +412,7 @@ export const Player = forwardRef(
              * Conditional rendering of video player components based on detected service
              * Each service has its own implementation with different capabilities
              */}
-            {video.service === 'youtube' || video.service === 'youtube-shorts' ? (
+            {video.service === 'youtube' ? (
               <Youtube
                 ref={playerRef}
                 id={video.id}

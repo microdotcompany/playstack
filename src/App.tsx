@@ -19,7 +19,15 @@ const App = () => {
         alignItems: 'center'
       }}
     >
-      <div style={{ maxWidth: '500px', width: '100%', overflow: 'hidden', borderRadius: '6px' }}>
+      <div
+        style={{
+          maxWidth: '800px',
+          width: '100%',
+          overflow: 'hidden',
+          borderRadius: '6px',
+          aspectRatio: '16/9'
+        }}
+      >
         <Player
           ref={playerRef}
           src={src}
@@ -164,7 +172,7 @@ const App = () => {
             <button
               onClick={() => {
                 setCustomMode(false);
-                setSrc('https://youtu.be/K-NDA_QpVYA');
+                setSrc('https://youtu.be/mN0zPOpADL4?si=zAGBEq2ZbICSJpJw');
               }}
               style={{
                 padding: '0.5rem 1.25rem',
