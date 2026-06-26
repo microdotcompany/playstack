@@ -12,6 +12,15 @@
   }
 }
 
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 /* ============================================================================
    COMMON CONTAINER STYLES
    ============================================================================ */
@@ -180,6 +189,14 @@
 .playstack-player-container .control-overlaid > div svg {
   height: 1.6rem;
   width: 1.6rem;
+}
+
+.playstack-player-container .control-overlaid:is(.close) > div:not(.loader) {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.playstack-player-container .control-overlaid:is(.close) {
+  animation: fade-out 5s ease-in-out forwards;
 }
 
 /* ============================================================================

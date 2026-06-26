@@ -46,11 +46,11 @@ export const Overlay = ({
   return error ? null : (
     <div
       role="button"
-      className="control-overlaid"
+      className={`control-overlaid ${!paused && !isInitialLoading ? 'close' : 'open'}`}
       style={{
         backgroundImage: showThumbnail ? `url(${thumbnail})` : undefined,
         backgroundColor: showThumbnail || isYtNotStarted ? 'black' : 'transparent', // show black background if thumbnail is shown or video is not started and service is youtube
-        opacity: !paused && !isInitialLoading ? 0 : 100, // hide the overlay if the video is not paused and not initial loading
+        //   opacity: !paused && !isInitialLoading ? 0 : 100, // hide the overlay if the video is not paused and not initial loading
         pointerEvents: deferToIframeControls ? 'none' : 'auto'
       }}
       onClick={() => {
