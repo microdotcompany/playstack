@@ -404,7 +404,7 @@ export const Player = forwardRef(
         {video ? (
           <div
             ref={containerRef}
-            className={`playstack-player-container ${video.service} ${started ? 'started' : ''} ${
+            className={`playstack-player-container ${video.service} ${isIOS ? 'ios' : ''} ${started ? 'started' : ''} ${
               config?.defaultControls || error ? 'default-controls' : ''
             }`}
           >

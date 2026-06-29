@@ -44,10 +44,7 @@ export const Controls = ({
   const paused = useMemo(() => state === 'paused', [state]);
 
   // Memoized value to determine if only the seekbar should be shown
-  const onlyShowSeekbar = useMemo(
-    () => isIOS && (service === 'youtube' || service === 'youtube-shorts'),
-    [isIOS, service]
-  );
+  const onlyShowSeekbar = useMemo(() => isIOS && service === 'youtube', [isIOS, service]);
 
   // Calculate remaining time in a human-readable format (days:hours:minutes:seconds)
   // Handles videos longer than 24 hours by including days and hours when needed

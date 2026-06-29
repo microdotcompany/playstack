@@ -27,19 +27,15 @@ export const Overlay = ({
     [started, state, ready]
   );
 
-  // Determine if video is not started and service is youtube or youtube-shorts
-  const isYtNotStarted = useMemo(
-    () => !started && (service === 'youtube' || service === 'youtube-shorts'),
-    [started, service]
-  );
+  // Determine if video is not started and service is youtube
+  const isYtNotStarted = useMemo(() => !started && service === 'youtube', [started, service]);
 
   // Show thumbnail only if video hasn't started and a thumbnail URL is provided
   const showThumbnail = useMemo(() => !started && thumbnail, [started, thumbnail]);
 
   // This allows embedded players (YouTube, Vimeo) to handle their own play button initially
   const deferToIframeControls = useMemo(
-    () =>
-      !started && (service === 'vimeo' || service === 'youtube' || service === 'youtube-shorts'),
+    () => !started && (service === 'vimeo' || service === 'youtube'),
     [service, started]
   );
 

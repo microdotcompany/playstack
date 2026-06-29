@@ -453,13 +453,19 @@
 }
 
 /* YouTube iframe scaling */
-.playstack-player-container:not(.default-controls):is(.youtube) iframe {
+.playstack-player-container:not(.ios):not(.default-controls):is(.youtube) iframe {
   height: 1000% !important;
   width: 1500% !important;
   scale: 0.075;
 }
 
-.playstack-player-container:has(.fullscreen):not(.default-controls):is(.youtube) iframe {
+/* iOS YouTube iframe scaling */
+.playstack-player-container:is(.ios):not(.default-controls):is(.youtube) iframe {
+  height: 1000% !important;
+  width: 100% !important;
+}
+
+.playstack-player-container:not(.ios):has(.fullscreen):not(.default-controls):is(.youtube) iframe {
   height: 1500% !important;
   scale: 0.067 !important;
 }
@@ -513,7 +519,8 @@
 
 /* Fullscreen YouTube scaling for portrait mode */
 @media screen and (orientation: portrait) and (max-width: 480px) and (min-height: 600px) {
-  .playstack-player-container:has(.fullscreen):not(.default-controls):is(.youtube) iframe {
+  .playstack-player-container:not(.ios):has(.fullscreen):not(.default-controls):is(.youtube)
+    iframe {
     height: 1500% !important;
     width: 1000% !important;
     scale: 0.099 !important;
