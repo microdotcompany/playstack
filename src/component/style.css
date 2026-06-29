@@ -454,20 +454,15 @@
 
 /* YouTube iframe scaling */
 .playstack-player-container:not(.ios):not(.default-controls):is(.youtube) iframe {
-  height: 1000% !important;
+  height: 1500% !important;
   width: 1500% !important;
-  scale: 0.075;
+  scale: 0.067;
 }
 
 /* iOS YouTube iframe scaling */
 .playstack-player-container:is(.ios):not(.default-controls):is(.youtube) iframe {
   height: 1000% !important;
   width: 100% !important;
-}
-
-.playstack-player-container:not(.ios):has(.fullscreen):not(.default-controls):is(.youtube) iframe {
-  height: 1500% !important;
-  scale: 0.067 !important;
 }
 
 /* Vimeo iframe scaling */
