@@ -456,7 +456,12 @@
 .playstack-player-container:not(.default-controls):is(.youtube) iframe {
   height: 1000% !important;
   width: 1500% !important;
-  scale: 0.085;
+  scale: 0.075;
+}
+
+.playstack-player-container:has(.fullscreen):not(.default-controls):is(.youtube) iframe {
+  height: 1500% !important;
+  scale: 0.067 !important;
 }
 
 /* Vimeo iframe scaling */
